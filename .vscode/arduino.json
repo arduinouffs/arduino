@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "Curso Programação/Curso de Arduino - Aula 04 - IF e ELSE.ino",
+    "programmer": "arduino:avrispmkii"
+}
