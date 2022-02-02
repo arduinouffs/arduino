@@ -1,21 +1,58 @@
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <title>Página Arduino</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Arduino</title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <style>
+        .temp_umid {
+            font-size: 50px;
+        }
+    </style>
+    <script>
+        function recebeDados() {
+            var nocache = "&nocache=" + Math.random() * 1000000;
+            var request = new XMLHttpRequest();
+            var posIni;
+            // var posFim;
+            request.onreadystatechange = function () {
+                let valPosIni;
+                let valPosFim;
+                if (this.responseText != null) {
+                    posIni = this.responseText.indexOf("t_ino");
+                    if (posIni > -1) {
+                        valPosIni = this.responseText.indexOf("#", posIni) + 1;
+                        valPosFim = this.responseText.indexOf("|", posIni);
+                        document.getElementById('temperatura').innerText = this.responseText.substring(valPosIni, valPosFim);
+                    }
+
+                    posIni = this.responseText.indexOf("u_ino");
+                    if (posIni > -1) {
+                        valPosIni = this.responseText.indexOf("#", posIni) + 1;
+                        valPosFim = this.responseText.indexOf("|", posIni);
+                        document.getElementById('umidade').innerText = this.responseText.substring(valPosIni, valPosFim);
+                    }
+                }
+            }
+            request.open("GET", "solicitacao_ajax" + nocache, true);
+            request.send(null);
+            setTimeout('recebeDados()', 1000);
+        }
+    </script>
 </head>
-<body>
+<body onload="recebeDados();">
     <h1>Controle de temperatura e umidade</h1>
     <div>
         <div>
             <h3>Temperatura</h3>
-            <div><span id="temperatura">10</span>°C</div>
+            <div class="temp_umid"><span id="temperatura">10</span>°C</div>
         </div>
 
         <div>
             <h3>Umidade</h3>
-            <div><span id="umidade">80</span>%</div>
+            <div class="temp_umid"><span id="umidade">80</span>%</div>
         </div>
     </div>
 </body>
