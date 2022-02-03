@@ -55,6 +55,17 @@ void loop() {
                 // a ultima linha da requisição do cliente é branca e termina com o caractere \n
                 // responde para o cliente apenas após a última linha recebida
                 if (c == '\n' && currentLineIsBlank) {
+                  tempUmid(client);
+                  // ENVIA A PÁGINA WEB
+                    webFile = SD.open("1~1.htm");        // abre o arquivo da pagina WEB
+                    if (webFile) {
+                        while(webFile.available()) {
+                            client.write(webFile.read());  // envia a pagina WEB para o cliente (browser)
+                        }
+                        webFile.close();
+                    }
+                    Serial.println("Página carregada");
+                    break;
                   if ( mainPageRequest(&HTTP_req) ) {
                     URLValue = getURLRequest(&HTTP_req);
 
@@ -72,6 +83,7 @@ void loop() {
                         }
                         webFile.close();
                     }
+                    Serial.println("Página carregada");
                     break;
                   } else if (HTTP_req.indexOf("solicitacao_ajax") > -1) {     //<----- NOVO
                         Serial.println(HTTP_req);
@@ -136,14 +148,14 @@ bool retorno = false;
      retorno = true;
   }  
 
-  if (valor.substring(0,10) == "/1~1.htm") {
+  if (valor.substring(0,10) == "/1.html") {
      retorno = true;
   }  
 
   return retorno;
 }
 
-void void tempUmid(EthernetClient cl) {
+void tempUmid(EthernetClient cl) {
   // A leitura da temperatura e umidade pode levar 250ms!
   // O atraso do sensor pode chegar a 2 segundos.
   float h = dht.readHumidity();
@@ -161,7 +173,7 @@ void void tempUmid(EthernetClient cl) {
     cl.print("u_ino#ERRO|");
   } else {
     cl.print("u_ino#");
-    cl.print(u);
+    cl.print(h);
     cl.print("|");
   }
 }
