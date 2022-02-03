@@ -50,17 +50,20 @@ void loop() {
         while (client.connected()) {
             if (client.available()) {   // os dados do cliente estão disponiveis para serem lidos
                 char c = client.read(); // lê 1 byte (character) do cliente
+                HTTP_req += c;  
                 
                 // a ultima linha da requisição do cliente é branca e termina com o caractere \n
                 // responde para o cliente apenas após a última linha recebida
                 if (c == '\n' && currentLineIsBlank) {
-                  
+                  if ( mainPageRequest(&HTTP_req) ) {
+                    URLValue = getURLRequest(&HTTP_req);
+
                     // envia o cabeçalho de uma resposta http padrão
                     client.println("HTTP/1.1 200 OK");
                     client.println("Content-Type: text/html");
                     client.println("Connection: keep-alive");
                     client.println();
-                    
+
                     // ENVIA A PÁGINA WEB
                     webFile = SD.open("1~1.htm");        // abre o arquivo da pagina WEB
                     if (webFile) {
@@ -70,6 +73,21 @@ void loop() {
                         webFile.close();
                     }
                     break;
+                  } else if (HTTP_req.indexOf("solicitacao_ajax") > -1) {     //<----- NOVO
+                        Serial.println(HTTP_req);
+
+                        client.println("HTTP/1.1 200 OK");
+                        client.println("Content-Type: text/html");
+                        client.println("Connection: keep-alive");      
+                        client.println();                      
+
+                        tempUmid(client);//roda funcao   
+                  } else {
+                        Serial.println(HTTP_req);
+                        client.println("HTTP/1.1 200 OK");
+                  }
+                  HTTP_req = "";    
+                  break;                
                 }
                 
                 // toda linha de texto recebida do cliente termina com os caracteres \r\n
@@ -90,3 +108,60 @@ void loop() {
         
     } // fim do if (client)
 } // fim do loop
+
+String getURLRequest(String *requisicao) {
+int inicio, fim;
+String retorno;
+
+  inicio = requisicao->indexOf("GET") + 3;
+  fim = requisicao->indexOf("HTTP/") - 1;
+  retorno = requisicao->substring(inicio, fim);
+  retorno.trim();
+
+  return retorno;
+}
+
+bool mainPageRequest(String *requisicao) {
+String valor;
+bool retorno = false;
+
+  valor = getURLRequest(requisicao);
+  valor.toLowerCase();
+
+  if (valor == "/") {
+     retorno = true;
+  }
+
+  if (valor.substring(0,2) == "/?") {
+     retorno = true;
+  }  
+
+  if (valor.substring(0,10) == "/1~1.htm") {
+     retorno = true;
+  }  
+
+  return retorno;
+}
+
+void void tempUmid(EthernetClient cl) {
+  // A leitura da temperatura e umidade pode levar 250ms!
+  // O atraso do sensor pode chegar a 2 segundos.
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  // testa se retorno é valido, caso contrário algo está errado.
+  if (isnan(t)) {
+    cl.print("t_ino#ERRO|");
+  } else {
+    cl.print("t_ino#");
+    cl.print(t);
+    cl.print("|");
+  }
+
+  if (isnan(h)) {
+    cl.print("u_ino#ERRO|");
+  } else {
+    cl.print("u_ino#");
+    cl.print(u);
+    cl.print("|");
+  }
+}
