@@ -38,6 +38,9 @@
             }
             request.open("GET", "solicitacao_ajax" + nocache, true);
             request.send(null);
+        }
+
+        while (true) {
             setTimeout('recebeDados()', 1000);
         }
     </script>
