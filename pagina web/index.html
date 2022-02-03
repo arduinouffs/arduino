@@ -39,10 +39,6 @@
             request.open("GET", "solicitacao_ajax" + nocache, true);
             request.send(null);
         }
-
-        while (true) {
-            setTimeout('recebeDados()', 1000);
-        }
     </script>
 </head>
 <body onload="recebeDados();">
@@ -58,5 +54,11 @@
             <div class="temp_umid"><span id="umidade">80</span>%</div>
         </div>
     </div>
+
+    <script>
+        while (true) {
+            setTimeout('recebeDados()', 5000);
+        }
+    </script>
 </body>
 </html>
