@@ -20,11 +20,7 @@ File webFile;
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-    Ethernet.begin(mac, ip);  // Inicializa a Ethernet Shield
-    server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     Serial.begin(9600);
-    dht.begin();
-
     Serial.println("Iniciando o cartao SD...");
     if (!SD.begin(4)) {
         Serial.println("ERRO - a inicializacao do cartao SD falhou!");
@@ -37,36 +33,32 @@ void setup() {
         Serial.println("ERRO - O arquivo 1~1.htm nao foi localizado!");
         return;   //aborta a função SETUP caso exista erro
     }
-    
     Serial.println("Arquivo 1~1.htm encontrado!");
+
+    Ethernet.begin(mac, ip);  // Inicializa a Ethernet Shield
+    server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
+    dht.begin();
 } // fim do setup
 
 void loop() {
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
 
     if (client) {  // Existe um cliente em conexão ?
-      
+//        Serial.println("if (client)");/
         boolean currentLineIsBlank = true;
         while (client.connected()) {
-            if (client.available()) {   // os dados do cliente estão disponiveis para serem lidos
+//            Serial.println("");/
+            if (client.available()) {
+//                Serial.println("if (client.available())");/
+            // os dados do cliente estão disponiveis para serem lidos
                 char c = client.read(); // lê 1 byte (character) do cliente
                 HTTP_req += c;  
                 
                 // a ultima linha da requisição do cliente é branca e termina com o caractere \n
                 // responde para o cliente apenas após a última linha recebida
                 if (c == '\n' && currentLineIsBlank) {
-                  tempUmid(client);
-                  // ENVIA A PÁGINA WEB
-                    webFile = SD.open("1~1.htm");        // abre o arquivo da pagina WEB
-                    if (webFile) {
-                        while(webFile.available()) {
-                            client.write(webFile.read());  // envia a pagina WEB para o cliente (browser)
-                        }
-                        webFile.close();
-                    }
-                    Serial.println("Página carregada");
-                    break;
                   if ( mainPageRequest(&HTTP_req) ) {
+//                    Serial.println("if ( mainPageRequest(&HTTP_req) )");/
                     URLValue = getURLRequest(&HTTP_req);
 
                     // envia o cabeçalho de uma resposta http padrão
@@ -77,12 +69,17 @@ void loop() {
 
                     // ENVIA A PÁGINA WEB
                     webFile = SD.open("1~1.htm");        // abre o arquivo da pagina WEB
+                    Serial.println(webFile);
                     if (webFile) {
+                      Serial.println("Pegou o arquivo");
                         while(webFile.available()) {
+                            Serial.print(".");
                             client.write(webFile.read());  // envia a pagina WEB para o cliente (browser)
                         }
+                        Serial.println();
                         webFile.close();
                     }
+                    client.println("Olá mundo");
                     Serial.println("Página carregada");
                     break;
                   } else if (HTTP_req.indexOf("solicitacao_ajax") > -1) {     //<----- NOVO
@@ -122,8 +119,8 @@ void loop() {
 } // fim do loop
 
 String getURLRequest(String *requisicao) {
-int inicio, fim;
-String retorno;
+  int inicio, fim;
+  String retorno;
 
   inicio = requisicao->indexOf("GET") + 3;
   fim = requisicao->indexOf("HTTP/") - 1;
@@ -134,21 +131,29 @@ String retorno;
 }
 
 bool mainPageRequest(String *requisicao) {
-String valor;
-bool retorno = false;
+  String valor;
+  bool retorno = false;
 
   valor = getURLRequest(requisicao);
   valor.toLowerCase();
 
+//  Serial.println("↓");
+//  Serial.println(valor);
+//  Serial.println("→");
+
   if (valor == "/") {
      retorno = true;
+  }
+
+  if (valor == "") {
+     retorno = true;  
   }
 
   if (valor.substring(0,2) == "/?") {
      retorno = true;
   }  
 
-  if (valor.substring(0,10) == "/1.html") {
+  if (valor.substring(0,10) == "/1~1.htm") {
      retorno = true;
   }  
 
