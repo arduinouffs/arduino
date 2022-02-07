@@ -7,10 +7,10 @@
 #define DHTTYPE DHT11 // DHT  
 
 String HTTP_req; 
-String URLValue;
+//String URLValue;
 
-String getURLRequest(String *requisicao);
-bool mainPageRequest(String *requisicao);
+//String getURLRequest(String *requisicao);
+//bool mainPageRequest(String *requisicao);
 void tempUmid(EthernetClient cl);
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
@@ -38,63 +38,48 @@ void setup() {
     Ethernet.begin(mac, ip);  // Inicializa a Ethernet Shield
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
+
+//    Serial.println(webFile = SD.open("1~1.htm"));
 } // fim do setup
 
 void loop() {
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
 
     if (client) {  // Existe um cliente em conexão ?
-//        Serial.println("if (client)");/
+        if (!webFile) {
+          webFile = SD.open("1~1.htm");  
+        }
         boolean currentLineIsBlank = true;
         while (client.connected()) {
-//            Serial.println("");/
             if (client.available()) {
-//                Serial.println("if (client.available())");/
-            // os dados do cliente estão disponiveis para serem lidos
                 char c = client.read(); // lê 1 byte (character) do cliente
-                HTTP_req += c;  
+                HTTP_req += c;
                 
-                // a ultima linha da requisição do cliente é branca e termina com o caractere \n
-                // responde para o cliente apenas após a última linha recebida
                 if (c == '\n' && currentLineIsBlank) {
-                  if ( mainPageRequest(&HTTP_req) ) {
-//                    Serial.println("if ( mainPageRequest(&HTTP_req) )");/
-                    URLValue = getURLRequest(&HTTP_req);
+                  client.println("HTTP/1.1 200 OK");
+                  client.println("Content-Type: text/html");
+                  client.println("Connection: keep-alive");
+                  client.println();
 
-                    // envia o cabeçalho de uma resposta http padrão
-                    client.println("HTTP/1.1 200 OK");
-                    client.println("Content-Type: text/html");
-                    client.println("Connection: keep-alive");
-                    client.println();
-
+                  Serial.print(HTTP_req.indexOf("solicitacao_ajax"));
+                  Serial.println(HTTP_req);
+                  if (HTTP_req.indexOf("solicitacao_ajax") > -1) {   
+                    Serial.println(" Entrou e rodou");                  
+                    tempUmid(client);//roda funcao   
+                  } else {
                     // ENVIA A PÁGINA WEB
-                    webFile = SD.open("1~1.htm");        // abre o arquivo da pagina WEB
-                    Serial.println(webFile);
+//                    webFile = SD.open("1~1.htm");  
                     if (webFile) {
-                      Serial.println("Pegou o arquivo");
                         while(webFile.available()) {
-                            Serial.print(".");
                             client.write(webFile.read());  // envia a pagina WEB para o cliente (browser)
                         }
-                        Serial.println();
                         webFile.close();
                     }
-                    client.println("Olá mundo");
                     Serial.println("Página carregada");
-                    break;
-                  } else if (HTTP_req.indexOf("solicitacao_ajax") > -1) {     //<----- NOVO
-                        Serial.println(HTTP_req);
-
-                        client.println("HTTP/1.1 200 OK");
-                        client.println("Content-Type: text/html");
-                        client.println("Connection: keep-alive");      
-                        client.println();                      
-
-                        tempUmid(client);//roda funcao   
-                  } else {
-                        Serial.println(HTTP_req);
-                        client.println("HTTP/1.1 200 OK");
                   }
+
+                  Serial.println();
+
                   HTTP_req = "";    
                   break;                
                 }
@@ -118,47 +103,47 @@ void loop() {
     } // fim do if (client)
 } // fim do loop
 
-String getURLRequest(String *requisicao) {
-  int inicio, fim;
-  String retorno;
-
-  inicio = requisicao->indexOf("GET") + 3;
-  fim = requisicao->indexOf("HTTP/") - 1;
-  retorno = requisicao->substring(inicio, fim);
-  retorno.trim();
-
-  return retorno;
-}
-
-bool mainPageRequest(String *requisicao) {
-  String valor;
-  bool retorno = false;
-
-  valor = getURLRequest(requisicao);
-  valor.toLowerCase();
-
-//  Serial.println("↓");
-//  Serial.println(valor);
-//  Serial.println("→");
-
-  if (valor == "/") {
-     retorno = true;
-  }
-
-  if (valor == "") {
-     retorno = true;  
-  }
-
-  if (valor.substring(0,2) == "/?") {
-     retorno = true;
-  }  
-
-  if (valor.substring(0,10) == "/1~1.htm") {
-     retorno = true;
-  }  
-
-  return retorno;
-}
+//String getURLRequest(String *requisicao) {
+//  int inicio, fim;
+//  String retorno;
+//
+//  inicio = requisicao->indexOf("GET") + 3;
+//  fim = requisicao->indexOf("HTTP/") - 1;
+//  retorno = requisicao->substring(inicio, fim);
+//  retorno.trim();
+//
+//  return retorno;
+//}
+//
+//bool mainPageRequest(String *requisicao) {
+//  String valor;
+//  bool retorno = false;
+//
+//  valor = getURLRequest(requisicao);
+//  valor.toLowerCase();
+//
+////  Serial.println("↓");
+////  Serial.println(valor);
+////  Serial.println("→");
+//
+//  if (valor == "/") {
+//     retorno = true;
+//  }
+//
+//  if (valor == "") {
+//     retorno = true;  
+//  }
+//
+//  if (valor.substring(0,2) == "/?") {
+//     retorno = true;
+//  }  
+//
+//  if (valor.substring(0,10) == "/1~1.htm") {
+//     retorno = true;
+//  }  
+//
+//  return retorno;
+//}
 
 void tempUmid(EthernetClient cl) {
   // A leitura da temperatura e umidade pode levar 250ms!

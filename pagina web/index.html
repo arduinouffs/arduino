@@ -15,7 +15,7 @@
     </style>
     <script>
         function recebeDados() {
-            var nocache = "&nocache=" + Math.random() * 1000000;
+            // var nocache = "&nocache=" + Math.random() * 1000000;
             var request = new XMLHttpRequest();
             var posIni;
             // var posFim;
@@ -38,22 +38,23 @@
                     }
                 }
             }
-            request.open("GET", "solicitacao_ajax" + nocache, true);
+            // request.open("GET", "solicitacao_ajax" + nocache, true);
+            request.open("GET", "solicitacao_ajax", true);
             request.send(null);
         }
     </script>
 </head>
-<body onload="recebeDados();">
+<body>
     <h1>Controle de temperatura e umidade</h1>
     <div>
         <div>
             <h3>Temperatura</h3>
-            <div class="temp_umid"><span id="temperatura">10</span>°C</div>
+            <div class="temp_umid"><span id="temperatura">-</span>°C</div>
         </div>
 
         <div>
             <h3>Umidade</h3>
-            <div class="temp_umid"><span id="umidade">80</span>%</div>
+            <div class="temp_umid"><span id="umidade">-</span>%</div>
         </div>
     </div>
 
