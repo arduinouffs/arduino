@@ -8,6 +8,7 @@
 
 String HTTP_req; 
 //String URLValue;
+bool connectedd = false;
 
 //String getURLRequest(String *requisicao);
 //bool mainPageRequest(String *requisicao);
@@ -49,26 +50,27 @@ void loop() {
         if (!webFile) {
           webFile = SD.open("1~1.htm");  
         }
+        
         boolean currentLineIsBlank = true;
-        while (client.connected()) {
+        while (client.connected()) {          
             if (client.available()) {
                 char c = client.read(); // lê 1 byte (character) do cliente
-                HTTP_req += c;
-                
-                if (c == '\n' && currentLineIsBlank) {
-                  client.println("HTTP/1.1 200 OK");
-                  client.println("Content-Type: text/html");
-                  client.println("Connection: keep-alive");
-                  client.println();
-
-                  Serial.print(HTTP_req.indexOf("solicitacao_ajax"));
+                HTTP_req.concat(c);
+                                
+                if (c == '\n' && currentLineIsBlank) {  
                   Serial.println(HTTP_req);
-                  if (HTTP_req.indexOf("solicitacao_ajax") > -1) {   
-                    Serial.println(" Entrou e rodou");                  
-                    tempUmid(client);//roda funcao   
+                  Serial.println(HTTP_req.indexOf('ajax'));
+
+                  if (HTTP_req.indexOf('ajax') > -1) {   
+//                  if (connectedd) {                
+                    tempUmid(client);//roda funcao
                   } else {
                     // ENVIA A PÁGINA WEB
-//                    webFile = SD.open("1~1.htm");  
+                    client.println("HTTP/1.1 200 OK");
+                    client.println("Content-Type: text/html");
+                    client.println("Connection: keep-alive");
+                    client.println();
+
                     if (webFile) {
                         while(webFile.available()) {
                             client.write(webFile.read());  // envia a pagina WEB para o cliente (browser)
@@ -76,9 +78,11 @@ void loop() {
                         webFile.close();
                     }
                     Serial.println("Página carregada");
+                    connectedd = true;
                   }
 
-                  Serial.println();
+
+                  Serial.println("-----------------------------------------------------------");
 
                   HTTP_req = "";    
                   break;                
@@ -99,7 +103,6 @@ void loop() {
         
         delay(1);      // da um tempo para o WEB Browser receber o texto
         client.stop(); // termina a conexão
-        
     } // fim do if (client)
 } // fim do loop
 
