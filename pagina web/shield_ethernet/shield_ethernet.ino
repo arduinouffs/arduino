@@ -5,8 +5,11 @@
 
 #define DHTPIN A1 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
+#define REQ_BUF_SZ   400
 
-String HTTP_req; 
+//char HTTP_req[REQ_BUF_SZ]; 
+String HTTP_req;
+int req_index = 0; 
 //String URLValue;
 bool connectedd = false;
 
@@ -45,8 +48,9 @@ void setup() {
 
 void loop() {
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
-
+//    Serial.println("a");
     if (client) {  // Existe um cliente em conexão ?
+//        Serial.println("Entrou");
         if (!webFile) {
           webFile = SD.open("1~1.htm");  
         }
@@ -56,12 +60,14 @@ void loop() {
             if (client.available()) {
                 char c = client.read(); // lê 1 byte (character) do cliente
                 HTTP_req.concat(c);
+//                if (req_index < (400 - 1)) {
+//                    HTTP_req[req_index] = c;          // save HTTP request character
+//                    req_index++;
+//                }
                                 
                 if (c == '\n' && currentLineIsBlank) {  
-                  Serial.println(HTTP_req);
-                  Serial.println(HTTP_req.indexOf('ajax'));
-
-                  if (HTTP_req.indexOf('ajax') > -1) {   
+//                  if (StrContains(HTTP_req, "solicitacao_ajax")) {   
+                  if (HTTP_req.indexOf("Ø") > -1 || HTTP_req.indexOf("%C3%98")) {
 //                  if (connectedd) {                
                     tempUmid(client);//roda funcao
                   } else {
@@ -83,8 +89,11 @@ void loop() {
 
 
                   Serial.println("-----------------------------------------------------------");
+                  Serial.println(HTTP_req);
 
-                  HTTP_req = "";    
+//                  req_index = 0;
+//                  StrClear(HTTP_req, REQ_BUF_SZ);
+                  HTTP_req = "";
                   break;                
                 }
                 
@@ -106,47 +115,38 @@ void loop() {
     } // fim do if (client)
 } // fim do loop
 
-//String getURLRequest(String *requisicao) {
-//  int inicio, fim;
-//  String retorno;
-//
-//  inicio = requisicao->indexOf("GET") + 3;
-//  fim = requisicao->indexOf("HTTP/") - 1;
-//  retorno = requisicao->substring(inicio, fim);
-//  retorno.trim();
-//
-//  return retorno;
-//}
-//
-//bool mainPageRequest(String *requisicao) {
-//  String valor;
-//  bool retorno = false;
-//
-//  valor = getURLRequest(requisicao);
-//  valor.toLowerCase();
-//
-////  Serial.println("↓");
-////  Serial.println(valor);
-////  Serial.println("→");
-//
-//  if (valor == "/") {
-//     retorno = true;
-//  }
-//
-//  if (valor == "") {
-//     retorno = true;  
-//  }
-//
-//  if (valor.substring(0,2) == "/?") {
-//     retorno = true;
-//  }  
-//
-//  if (valor.substring(0,10) == "/1~1.htm") {
-//     retorno = true;
-//  }  
-//
-//  return retorno;
-//}
+char StrContains(char *str, char *sfind) {
+    char found = 0;
+    char index = 0;
+    char len;
+ 
+    len = strlen(str);
+   
+    if (strlen(sfind) > len) {
+        return 0;
+    }
+    while (index < len) {
+        if (str[index] == sfind[found]) {
+            found++;
+            if (strlen(sfind) == found) {
+                return 1;
+            }
+        }
+        else {
+            found = 0;
+        }
+        index++;
+    }
+ 
+    return 0;
+}
+
+char StrClear(char *str, int width) {
+    for (int i = 0; i < width; i++) {
+      str[i] = "";
+    }
+    return str;
+}
 
 void tempUmid(EthernetClient cl) {
   // A leitura da temperatura e umidade pode levar 250ms!
