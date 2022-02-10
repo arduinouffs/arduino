@@ -13,10 +13,9 @@
 //
 //int pin2 = 3;
 //int pin1 = 2;
+unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long duration1;
 unsigned long duration2;
-unsigned long starttime;
-unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long lowpulseoccupancy1 = 0;
 unsigned long lowpulseoccupancy2 = 0;
 float ratio1 = 0;
@@ -32,7 +31,6 @@ MQ2 mq2(MQ2PIN);
 
 void setup() {
     Serial.begin(9600);
-
     Ethernet.begin(mac, ip);  // Inicializa a Ethernet Shield
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
@@ -54,39 +52,49 @@ void loop() {
                     client.println("Content-Type: aplication/json");
 //                    client.println("Connection: keep-alive");
                     client.println("Connection: close");
-                    client.println();    
+                    client.println();
 
-                    client.print("{");
-                    client.print('"');//
-                    client.print("temperatura");
-                    client.print('"');
-                    client.print(':');
+                    duration1 = pulseIn(pin1, LOW);
+                    duration2 = pulseIn(pin2, LOW);
+                    lowpulseoccupancy1 = lowpulseoccupancy1+duration1;
+                    lowpulseoccupancy2 = lowpulseoccupancy2+duration2;
+
+                    ratio1 = lowpulseoccupancy1/(sampletime_ms*10.0);  // Integer percentage 0=>100
+                    concentration1 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; // using spec sheet curve
+                  
+                    ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
+                    concentration2 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
+
+                    client.print("{\n\t\"temperatura\": ");
                     client.print(dht.readTemperature());
-                    client.print(",");
-                    client.print('"');//
-                    client.print("Umidade");
-                    client.print('"');
-                    client.print(':');
+                    client.print(",\n\t\"umidade\": ");
                     client.print(dht.readHumidity());
-                    client.print(",");
-                    client.print('"');//
-                    client.print("Gás Inflamável");
-                    client.print('"');
-                    client.print(':');
+                    client.print(",\n\t\"gas inflamavel\": ");
                     client.print(mq2.readLPG());
-                    client.print(",");
-                    client.print('"');//
-                    client.print("CO2");
-                    client.print('"');
-                    client.print(':');
+                    client.print(",\n\t\"CO2\": ");
                     client.print(mq2.readCO());
-                    client.print(",");
-                    client.print('"');//
-                    client.print("Fumaça");
-                    client.print('"');
-                    client.print(':');
+                    client.print(",\n\t\"fumaca\": ");
                     client.print(mq2.readSmoke());
-                    client.print("}");
+                    client.print(",\n\t\"ar\": {\n\t\t\"concentracao1\": ");
+                    client.print(concentration1);
+                    client.print(" pcs/0.01cf,\n\t\t\"concentracao2\": ");
+                    client.print(concentration2);
+                    client.print(" pcs/0.01cf,\n\t\t\"consideracao de ar\": ");
+                    if (concentration1 < 1000) {
+                     client.print("CLEAN");
+                    } else if (concentration1 > 1000 && concentration1 < 10000) {
+                     client.print("GOOD");
+                    } else if (concentration1 > 10000 && concentration1 < 20000) {      
+                     client.print("ACCEPTABLE");
+                    } else if (concentration1 > 20000 && concentration1 < 50000) {
+                     client.print("HEAVY");
+                    } else {   // (concentration1 > 50000 )
+                     client.print("HAZARD");  
+                    }
+                    client.print("\n\t}\n}");
+
+                    lowpulseoccupancy1 = 0;
+                    lowpulseoccupancy2 = 0;
 
                     break;                
                 }
