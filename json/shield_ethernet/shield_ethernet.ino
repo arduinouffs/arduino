@@ -8,14 +8,17 @@
 #define DHTPIN A1 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
 #define MQ2PIN A2
-#define pin2 3
-#define pin1 2
-//
-//int pin2 = 3;
-//int pin1 = 2;
+
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 100, 40); // Endereço IP que a Ethernet Shield terá. Deve ser alterado para um endereço livre da sua rede.
+EthernetServer server(80);     // Cria um servidor WEB
+DHT dht(DHTPIN, DHTTYPE);
+MQ2 mq2(MQ2PIN);
+//DynamicJsonDocument doc(1024);
+
+unsigned long starttime;
 unsigned long duration1;
 unsigned long duration2;
-unsigned long starttime;
 unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long lowpulseoccupancy1 = 0;
 unsigned long lowpulseoccupancy2 = 0;
@@ -24,19 +27,13 @@ float ratio2 = 0;
 float concentration1 = 0;
 float concentration2 = 0;
 
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 100, 40); // Endereço IP que a Ethernet Shield terá. Deve ser alterado para um endereço livre da sua rede.
-EthernetServer server(80);     // Cria um servidor WEB
-DHT dht(DHTPIN, DHTTYPE);
-MQ2 mq2(MQ2PIN);
-
 void setup() {
     Serial.begin(9600);
-
     Ethernet.begin(mac, ip);  // Inicializa a Ethernet Shield
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
+    starttime = millis();
 } // fim do setup
 
 void loop() {
@@ -58,7 +55,7 @@ void loop() {
 
                     client.print("{");
                     client.print('"');//
-                    client.print("temperatura");
+                    client.print("Temperatura");
                     client.print('"');
                     client.print(':');
                     client.print(dht.readTemperature());
@@ -87,7 +84,13 @@ void loop() {
                     client.print(':');
                     client.print(mq2.readSmoke());
                     client.print("}");
-
+//                    doc["temperatura"] = dht.readTemperature();
+//                    doc["umidade"] = dht.readHumidity();
+//                    doc["Gás Inflmável"] = mq2.readLPG();
+//                    doc["CO2"] = mq2.readCO();
+//                    doc["Fumaça"] = mq2.readSmoke();
+//
+//                    client.print(serializeJson(doc, client));
                     break;                
                 }
                 
@@ -108,3 +111,7 @@ void loop() {
         client.stop(); // termina a conexão
     } // fim do if (client)
 } // fim do loop
+
+String readAirQuality() {
+  
+}
