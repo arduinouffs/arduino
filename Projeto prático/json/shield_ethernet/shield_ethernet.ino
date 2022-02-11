@@ -1,18 +1,17 @@
 #include <SPI.h>
 #include <Ethernet.h>
-//#include <SD.h>
 #include <DHT.h>
-//#include <ArduinoJson.h>
 #include <MQ2.h>
+#include <EmonLib.h>
 
 #define DHTPIN A1 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
 #define MQ2PIN A2
 #define pin2 3
 #define pin1 2
-//
-//int pin2 = 3;
-//int pin1 = 2;
+#define VOLTPIN A3
+#define VOLT_CAL 440.7
+
 unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long duration1;
 unsigned long duration2;
@@ -28,6 +27,7 @@ IPAddress ip(192, 168, 100, 40); // Endereço IP que a Ethernet Shield terá. De
 EthernetServer server(80);     // Cria um servidor WEB
 DHT dht(DHTPIN, DHTTYPE);
 MQ2 mq2(MQ2PIN);
+EnergyMonitor emon1;
 
 void setup() {
     Serial.begin(9600);
@@ -35,6 +35,7 @@ void setup() {
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
+    emon1.voltage(VOLTPIN, VOLT_CAL, 1.7);
 } // fim do setup
 
 void loop() {
@@ -65,6 +66,8 @@ void loop() {
                     ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
                     concentration2 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
 
+                    emon1.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
+  
                     client.print("{\n\t\"temperatura\": ");
                     client.print(dht.readTemperature());
                     client.print(",\n\t\"umidade\": ");
@@ -91,7 +94,9 @@ void loop() {
                     } else {   // (concentration1 > 50000 )
                      client.print("HAZARD");  
                     }
-                    client.print("\n\t}\n}");
+                    client.print("\n\t}\n\t\"voltagem\": ");
+                    client.print(emon1.Vrms);
+                    client.print("\n}");
 
                     lowpulseoccupancy1 = 0;
                     lowpulseoccupancy2 = 0;
