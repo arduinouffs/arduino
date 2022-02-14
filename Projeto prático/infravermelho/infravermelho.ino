@@ -1,6 +1,6 @@
 // INCLUSÃO DE BIBLIOTECA
 #include <IRremote.h>
-//#include <PushButton.h>
+#include <PushButton.h>
 
 // DIRETIVAS DE COMPILAÇÃO
 #define tempoTecla 350
@@ -8,13 +8,18 @@
 
 // DEFINIÇÃO DOS PINOS
 #define pinReceptor 5
-//#define pinBot1 8
-#define pinLed 12
+#define pinEmissor 3
+#define pinBot1 8
+#define pinLed 2
+#define pinLiga 5
+#define pinDesliga 4
 
 // INSTANCIANDO OBJETOS
 IRrecv receptorIR(pinReceptor);
 IRsend emissorIR;
 //PushButton botaoLeitura(pinBot1);
+PushButton botaoLiga(pinLiga);
+PushButton botaoDesliga(pinDesliga);
 
 // DECLARAÇÃO VARIÁVEIS GLOBAIS
 bool lerComando = false;
@@ -36,7 +41,9 @@ unsigned int teclaD[] = {/*COPIE_OS_DADOS_DENTRO_DAS_CHAVES_DO_MONITOR_SERIAL_E_
 
 void setup() {
   Serial.begin(9600);
-  pinMode(pinLed, OUTPUT);
+//  pinMode(pinLed, OUTPUT);
+  pinMode(pinDesliga, INPUT_PULLUP);
+  pinMode(pinLiga, INPUT_PULLUP);
 
   // INICIANDO RECEPTOR IR
   receptorIR.enableIRIn();
@@ -45,9 +52,10 @@ void setup() {
 }
 
 void loop() {
-//  // MÉTODO PARA LEITURA E ATUALIZAÇÃO DAS PROPRIEDADES DO BOTÃO
-//  botaoLeitura.button_loop();
-//
+  // MÉTODO PARA LEITURA E ATUALIZAÇÃO DAS PROPRIEDADES DO BOTÃO
+  botaoLiga.button_loop();
+  botaoDesliga.button_loop();
+
 //  // BLOCO CONDIÇÕES PARA INICIAR LEITURA
 //  if (botaoLeitura.pressed() && !lerComando) {
 //    lerComando = true;
@@ -56,6 +64,18 @@ void loop() {
 //    lerComando = false;
 //    digitalWrite(pinLed, LOW);
 //  }
+
+  if (botaoDesliga.pressed()) {
+    emissorIR.sendRaw(desliga, sizeof(desliga) / sizeof(desliga[0]), frequencia);
+    Serial.println("Enviando Tecla desliga clonada");
+    delay(tempoTecla);
+  }
+
+  if (botaoLiga.pressed()) {
+    emissorIR.sendRaw(liga, sizeof(liga) / sizeof(liga[0]), frequencia);
+      Serial.println("Enviando Tecla liga clonada");
+      delay(tempoTecla);
+  }
 
   // LAÇO PARA LEITURA DO RECEPTOR IR QUANDO FOR PRESSIONADO O BOTÃO
   while (lerComando) {
@@ -79,17 +99,17 @@ void loop() {
     char tecla = Serial.read();
 
     switch (tecla) {
-      case 'a':
-        emissorIR.sendRaw(teclaA, sizeof(teclaA) / sizeof(teclaA[0]), frequencia);
-        Serial.println("Enviando Tecla A clonada");
-        delay(tempoTecla);
-        break;
-
-      case 'b':
-        emissorIR.sendRaw(teclaB, sizeof(teclaB) / sizeof(teclaB[0]), frequencia);
-        Serial.println("Enviando Tecla B clonada");
-        delay(tempoTecla);
-        break;
+//      case 'a':
+//        emissorIR.sendRaw(teclaA, sizeof(teclaA) / sizeof(teclaA[0]), frequencia);
+//        Serial.println("Enviando Tecla A clonada");
+//        delay(tempoTecla);
+//        break;
+//
+//      case 'b':
+//        emissorIR.sendRaw(teclaB, sizeof(teclaB) / sizeof(teclaB[0]), frequencia);
+//        Serial.println("Enviando Tecla B clonada");
+//        delay(tempoTecla);
+//        break;
 
       case 'c':
         emissorIR.sendRaw(teclaC, sizeof(teclaC) / sizeof(teclaC[0]), frequencia);
