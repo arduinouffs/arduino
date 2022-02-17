@@ -65,7 +65,7 @@ void loop() {
   myFile = SD.open("data.txt", FILE_WRITE);
   // if the file opened okay, write to it:
   if (myFile) {
-    Serial.print("Writing to data.txt...");
+    Serial.println("Escrevendo em data.txt...");
     
     myFile.print("MQ135 RZero: ");
     myFile.print(rzero);
@@ -79,10 +79,23 @@ void loop() {
     myFile.print("\t Corrected PPM: ");
     myFile.print(correctedPPM);
     myFile.println("ppm");
+
+    Serial.print("MQ135 RZero: ");
+    Serial.print(rzero);
+    Serial.print("\t Corrected RZero: ");
+    Serial.print(correctedRZero);
+    Serial.print("\t Resistance: ");
+    Serial.print(resistance);
+    Serial.print("\t PPM: ");
+    Serial.print(ppm);
+    Serial.print("ppm");
+    Serial.print("\t Corrected PPM: ");
+    Serial.print(correctedPPM);
+    Serial.println("ppm");
     
     // close the file:
     myFile.close();
-    Serial.println("done.");
+    Serial.println("Escrito em data.txt com sucesso.");
   } else {
     // if the file didn't open, print an error:
     Serial.println("error opening data.txt");
