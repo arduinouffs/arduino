@@ -1,31 +1,30 @@
 #include <LiquidCrystal.h>
 
-LiquidCrystal lcd(2,4,10,11,12,13);
+//                rs  e   d4  d5   d6   d7
+LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
+
+byte smile[8] = {
+  B11100,
+  B10100,
+  B11100,
+//  B00000,
+//  B00000,
+//  B00000,
+//  B00000,
+//  B00000
+};
 
 void setup() {
-  pinMode(5, OUTPUT);
-  analogWrite(5, 0);
-
+  lcd.createChar(0, smile);
   lcd.begin(16,2);
-  lcd.blink();
+  lcd.print("Hello world!!!");
+  lcd.setCursor(0, 1); // coluna linha
+  lcd.print("UFFS");
+  delay(1000);
+  lcd.clear();
+  lcd.write(byte(0));
 }
 
 void loop() {
-
-  lcd.clear();
-  lcd.home();
-
-  //lcd.setCursor(15,0);
-  //lcd.rightToLeft();
-
-  //lcd.setCursor(0,0);
-  //lcd.leftToRight();
-  
-  //lcd.autoscroll();
-  //lcd.setCursor(8,0);
-  
-  for (int c = 0; c < 10; c++) {
-      lcd.write(byte(48 + c));
-      delay(1000);
-  }
+  delay(99999999);
 }

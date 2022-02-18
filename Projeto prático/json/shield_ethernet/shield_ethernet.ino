@@ -3,6 +3,7 @@
 #include <DHT.h>
 #include <MQ2.h>
 #include <EmonLib.h>
+#include <LiquidCrystal.h>
 
 #define DHTPIN A1 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
@@ -12,6 +13,7 @@
 #define VOLTPIN A3
 #define VOLT_CAL 440.7
 
+unsigned long tempo = 0;
 unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long duration1;
 unsigned long duration2;
@@ -21,24 +23,74 @@ float ratio1 = 0;
 float ratio2 = 0;
 float concentration1 = 0;
 float concentration2 = 0;
+byte grau[8] = {
+  B11100,
+  B10100,
+  B11100,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000
+};
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 100, 40); // Endereço IP que a Ethernet Shield terá. Deve ser alterado para um endereço livre da sua rede.
+//IPAddress ip(192, 168, 100, 40); // Endereço IP que a Ethernet Shield terá. Deve ser alterado para um endereço livre da sua rede./
 EthernetServer server(80);     // Cria um servidor WEB
 DHT dht(DHTPIN, DHTTYPE);
 MQ2 mq2(MQ2PIN);
 EnergyMonitor emon1;
+//                rs  e   d4  d5   d6   d7
+LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
 
 void setup() {
     Serial.begin(9600);
-    Ethernet.begin(mac, ip);  // Inicializa a Ethernet Shield
+    lcd.createChar(0, grau);
+    lcd.begin(16,2);
+    lcd.print("Obtendo IP");
+    IPAddress ip(Ethernet.localIP());
+    while (String(ip) != "255.255.255.255" || String(ip) != "0.0.0.0") {
+      lcd.clear();
+      lcd.print("Obtendo IP");
+      delay(2500);
+      lcd.print(".");
+      delay(2500);
+      lcd.print(".");
+      delay(2500);
+      lcd.print(".");
+      delay(2500);
+      IPAddress ip(Ethernet.localIP());
+      Serial.println(ip);
+    }
+    Ethernet.begin(mac, ip, Ethernet.dnsServerIP(), Ethernet.gatewayIP(), Ethernet.subnetMask());  // Inicializa a Ethernet Shield
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
     emon1.voltage(VOLTPIN, VOLT_CAL, 1.7);
+    for (int i = 30; i > 0; i--) {
+      lcd.clear();
+      lcd.print("IP local:");
+      lcd.setCursor(0,1);
+      lcd.print(Ethernet.localIP());
+      lcd.setCursor(13,0);
+      lcd.print(i);
+      lcd.print("s");
+      delay(1000);
+    }
 } // fim do setup
 
 void loop() {
+    if (millis() > tempo) {
+      lcd.clear();
+      lcd.print("Temperatura: ");
+      lcd.print(int(dht.readTemperature()));
+      lcd.write(byte(0));
+      lcd.setCursor(0, 1);
+      lcd.print("Umidade:     ");
+      lcd.print(int(dht.readHumidity()));
+      lcd.print("%");
+      tempo = millis() + 1000;
+    }
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
     if (client) {  // Existe um cliente em conexão ?        
         boolean currentLineIsBlank = true;
