@@ -13,7 +13,8 @@
 #define VOLTPIN A3
 #define VOLT_CAL 440.7
 
-unsigned long tempo = 0;
+unsigned long tempoDisplay = 0;
+unsigned long tempoRenvIP = 0;
 unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long duration1;
 unsigned long duration2;
@@ -35,7 +36,6 @@ byte grau[8] = {
 };
 
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-//IPAddress ip(192, 168, 100, 40); // Endereço IP que a Ethernet Shield terá. Deve ser alterado para um endereço livre da sua rede./
 EthernetServer server(80);     // Cria um servidor WEB
 DHT dht(DHTPIN, DHTTYPE);
 MQ2 mq2(MQ2PIN);
@@ -43,31 +43,16 @@ EnergyMonitor emon1;
 //                rs  e   d4  d5   d6   d7
 LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
 
-void setup() {
+void setup() {  
     Serial.begin(9600);
+    Ethernet.begin(mac); 
     lcd.createChar(0, grau);
     lcd.begin(16,2);
-    lcd.print("Obtendo IP");
-    IPAddress ip(Ethernet.localIP());
-    while (String(ip) != "255.255.255.255" || String(ip) != "0.0.0.0") {
-      lcd.clear();
-      lcd.print("Obtendo IP");
-      delay(2500);
-      lcd.print(".");
-      delay(2500);
-      lcd.print(".");
-      delay(2500);
-      lcd.print(".");
-      delay(2500);
-      IPAddress ip(Ethernet.localIP());
-      Serial.println(ip);
-    }
-    Ethernet.begin(mac, ip, Ethernet.dnsServerIP(), Ethernet.gatewayIP(), Ethernet.subnetMask());  // Inicializa a Ethernet Shield
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
     emon1.voltage(VOLTPIN, VOLT_CAL, 1.7);
-    for (int i = 30; i > 0; i--) {
+    for (int i = 50; i > 0; i--) {
       lcd.clear();
       lcd.print("IP local:");
       lcd.setCursor(0,1);
@@ -80,7 +65,7 @@ void setup() {
 } // fim do setup
 
 void loop() {
-    if (millis() > tempo) {
+    if (millis() > tempoDisplay) {
       lcd.clear();
       lcd.print("Temperatura: ");
       lcd.print(int(dht.readTemperature()));
@@ -89,8 +74,13 @@ void loop() {
       lcd.print("Umidade:     ");
       lcd.print(int(dht.readHumidity()));
       lcd.print("%");
-      tempo = millis() + 1000;
+      tempoDisplay = millis() + 10000;
     }
+    if (millis() > tempoRenvIP) {
+      Ethernet.maintain();
+      tempoRenvIP = millis() + 600000; // 10 minutos
+    }
+    
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
     if (client) {  // Existe um cliente em conexão ?        
         boolean currentLineIsBlank = true;
@@ -146,7 +136,7 @@ void loop() {
                     } else {   // (concentration1 > 50000 )
                      client.print("HAZARD");  
                     }
-                    client.print("\n\t}\n\t\"voltagem\": ");
+                    client.print("\n\t},\n\t\"voltagem\": ");
                     client.print(emon1.Vrms);
                     client.print("\n}");
 
