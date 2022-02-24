@@ -1,7 +1,7 @@
 
 // #include <LiquidCrystal.h>
 //LiquidCrystal //    lcd(8, 9, 4, 5, 6, 7);
-
+// nome: dsm501a pm2.5
 int pin2 = 3;
 int pin1 = 2;
 unsigned long duration1;
