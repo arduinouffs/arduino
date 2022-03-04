@@ -7,10 +7,10 @@
 
 unsigned long tempo = 0;
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-unsigned long tempo = 0;
 bool ipDisplay = true;
+int cont = 0;
 
-U8GLIB_SH1106_128X64 u8g(2, 3, 6, 5, 4);  // D0=13, D1=11, CS=10, DC=9, Reset=8
+U8GLIB_SH1106_128X64 oled(7, 6, 3, 4, 5);  // D0, D1, CS, DC, Reset
 EthernetServer server(80);     // Cria um servidor 
 
 String IpAddressToString(const IPAddress& ipAddress) {
@@ -27,45 +27,56 @@ void setup() {
   if (IpAddressToString(Ethernet.localIP()).length() > 13) {
     ipDisplay = false;
   }
-    u8g.setFont(u8g_font_helvR12);
+  oled.setFont(u8g_font_helvR12);
+  Serial.println(IpAddressToString(Ethernet.localIP()));
 }
 void loop() {
-  u8g.firstPage();
-  float temperatura = 50;
-  float umidade = 70;
-  
-  do {
-    if (ipDisplay) {
-      u8g.drawStr(0, 12, "IP:");
-      u8g.setPrintPos(18, 12);
-    } else {
-      u8g.setPrintPos(0, 12);
-    }
-    u8g.print(Ethernet.localIP());
+  oled.firstPage();
+  int temperatura = 50;
+  int umidade = 70;
 
-    if (millis() > tempo + 60000) {
-      u8g.drawStr(0, 55, "Temp:");  
-      u8g.setPrintPos(75, 55);
-      u8g.print(temperatura);
-      u8g.print((char)176);
-      u8g.print("C");
+  if (millis() > tempo) {
+    do {
+      if (ipDisplay) {
+        oled.drawStr(0, 12, "IP:");
+        oled.setPrintPos(18, 12);
+      } else {
+        oled.setPrintPos(0, 12);
+      }
+      oled.print(Ethernet.localIP());
+
+      if (cont == 0) {
+        oled.drawStr(0, 55, "Temp:");  
+        oled.setPrintPos(75, 55);
+        oled.print(temperatura);
+        oled.print((char)176);
+        oled.print("C");
+        
+        oled.drawStr(0, 35, "Umid:");
+        oled.setPrintPos(75, 35);
+        oled.print(umidade);
+        oled.print("%");   
+      } else if (cont == 1) {
+        oled.drawStr(0, 55, "Fumaca:");  
+        oled.setPrintPos(75, 55);
+        oled.print(temperatura);
+        oled.print((char)176);
+        oled.print("C");
+        
+        oled.drawStr(0, 35, "CO2:");
+        oled.setPrintPos(75, 35);
+        oled.print(umidade);
+        oled.print("%");   
+      }
       
-      u8g.drawStr(0, 35, "Umid:");
-      u8g.setPrintPos(75, 35);
-      u8g.print(umidade);
-      u8g.print("%"); 
-    } else if (millis() > tempo + 50000) {
-      u8g.drawStr(0, 55 , "CO2");
-    } else if (millis() > tempo + 40000) {
-      
-    } else if (millis() > tempo + 30000) {
-      
-    } else if (millis() > tempo + 20000) {
-      
-    }
+    } while( oled.nextPage() );
     
-  } while( u8g.nextPage() );
-  tempo = millis();
+    tempo = millis() + 2000;
+    cont++;
+    if (cont > 1) {
+      cont = 0;
+    }
+  }
   
-  delay(5000);
+  
 }
