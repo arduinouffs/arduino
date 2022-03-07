@@ -4,28 +4,41 @@
 #include <MQ135.h>
 #include <DHT.h>
 
-#define PIN_MQ135 A3 // MQ135 Analog Input Pin
-#define pin  A5
-#define A_PIN 2
+#define MQ135_PIN A3 // MQ135 Analog Input MQ2_PIN
+#define MQ2_PIN  A5
+#define MQ7_PIN 2
 #define VOLTAGE 5
 #define         Board                   ("Arduino UNO")
-#define         Pin                     (A4)  //Analog input 4 of your arduino
+#define         MQ9_PIN                     (A4)  //Analog input 4 of your arduino
 #define         Type                    ("MQ-9") //MQ9
 #define         Voltage_Resolution      (5)
 #define         ADC_Bit_Resolution      (10) // For arduino UNO/MEGA/NANO
 #define         RatioMQ9CleanAir        (9.6) //RS / R0 = 60 ppm 
 #define dhtpin A2
 #define dhttype DHT11
+#define pin2 4 // DSM501A
+#define pin1 3 // DSM501A
 
-MQ7 mq7(A_PIN, VOLTAGE);
-MQUnifiedsensor MQ9(Board, Voltage_Resolution, ADC_Bit_Resolution, Pin, Type);
-MQ2 mq2(pin);
-MQ135 mq135_sensor(PIN_MQ135);
+unsigned long sampletime_ms = 5000;//sampe 1s ;
+unsigned long duration1;
+unsigned long duration2;
+unsigned long lowpulseoccupancy1 = 0;
+unsigned long lowpulseoccupancy2 = 0;
+float ratio1 = 0;
+float ratio2 = 0;
+float concentration1 = 0;
+float concentration2 = 0;
+
+MQ7 mq7(MQ7_PIN, VOLTAGE);
+MQUnifiedsensor MQ9(Board, Voltage_Resolution, ADC_Bit_Resolution, MQ9_PIN, Type);
+MQ2 mq2(MQ2_PIN);
+MQ135 mq135_sensor(MQ135_PIN);
 DHT dht(dhtpin, dhttype);
 
 void setup() {
   Serial.begin(9600);
-
+  pinMode(2,INPUT);
+  pinMode(3,INPUT);
   while (!Serial) {
     ; // wait for serial connection
   }
@@ -36,13 +49,14 @@ void setup() {
   float calcR0 = 0;
   for(int i = 1; i<=10; i ++)
   {
-    MQ9.update(); // Update data, the arduino will be read the voltage on the analog pin
+    MQ9.update(); // Update data, the arduino will be read the voltage on the analog MQ2_PIN
     calcR0 += MQ9.calibrate(RatioMQ9CleanAir);
     Serial.print(".");
   }
   MQ9.setR0(calcR0/10);
   if(isinf(calcR0)) {Serial.println("MQ-9: Warning: Conection issue founded, R0 is infite (Open circuit detected) please check your wiring and supply"); while(1);}
-  if(calcR0 == 0){Serial.println("MQ-9: Warning: Conection issue founded, R0 is zero (Analog pin with short circuit to ground) please check your wiring and supply"); while(1);}
+  if(calcR0 == 0){Serial.println("MQ-9: Warning: Conection issue founded, R0 is zero (Analog MQ2_PIN with short circuit to ground) please check your wiring and supply"); while(1);}
+  dht.begin();
 }
 
 void loop() {
@@ -50,7 +64,7 @@ void loop() {
   Serial.print("PPM = "); Serial.println(mq7.readPpm());
   
   Serial.println("\n********************************MQ-9(CO2, GLP, CH2)*******************************");
-  MQ9.update(); // Update data, the arduino will be read the voltage on the analog pin
+  MQ9.update(); // Update data, the arduino will be read the voltage on the analog MQ2_PIN
   /*
   Exponential regression:
   GAS     | a      | b
@@ -97,6 +111,49 @@ void loop() {
   Serial.print("\t Corrected PPM: ");
   Serial.print(correctedPPM);
   Serial.println("ppm");
+
+  Serial.println("\n***************************************DSM501A**************************************");
+  duration1 = pulseIn(pin1, LOW);
+  duration2 = pulseIn(pin2, LOW);
+  lowpulseoccupancy1 = lowpulseoccupancy1+duration1;
+  lowpulseoccupancy2 = lowpulseoccupancy2+duration2;
+
+  ratio1 = lowpulseoccupancy1/(sampletime_ms*10.0);  // Integer percentage 0=>100
+  concentration1 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; // using spec sheet curve
+
+  ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
+  concentration2 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
+
+  Serial.print("concentration1(PM2.5) = ");
+  Serial.print(concentration1);
+  Serial.print(" pcs/0.01cf  -  ");
+
+  Serial.print("concentration2(PM10) = ");
+  Serial.print(concentration2);
+  Serial.print(" pcs/0.01cf  -  ");
+
   
-  delay(10000);
+  if (concentration1 < 1000) {
+   Serial.print("Clean");
+  }
+  
+  if (concentration1 > 1000 && concentration1 < 10000) {
+   Serial.print("GOOD");
+  }
+  
+  if (concentration1 > 10000 && concentration1 < 20000) {      
+   Serial.print("ACCEPTABLE");
+  }
+    if (concentration1 > 20000 && concentration1 < 50000) {
+   Serial.print("HEAVY");
+}
+
+  if (concentration1 > 50000 ) {   
+   Serial.print("HAZARD");        
+  } 
+
+  lowpulseoccupancy1 = 0;
+  lowpulseoccupancy2 = 0;
+  
+  delay(5000);
 }
