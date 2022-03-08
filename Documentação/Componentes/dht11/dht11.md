@@ -3,7 +3,7 @@
 Este sensor é capaz de ler a temperatura do ambiente em F° ou C° com uma precisão de +/-2°C(temperatura) e +/-5%(umidade relativa do ar). Consegue ler parâmetros de umidade entre 20-90%(umidade relativa do ar) e temperatura entre 0-50°C.
 #### Montagem
 Há diferentes variantes deste mesmo sensor, por isso deve-se tomar cuidado com a pinagem. Neste caso foi utilizado a versão de 3 pinos soldada em uma placa: 
-`![dht11](dht11.png)`
+![dht11](dht11.png)
 |Pino|Função|
 |-|-|
 |S|Dado|
