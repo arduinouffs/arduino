@@ -20,8 +20,8 @@ Este display é capaz de trabalhar de 2 formas possíveis: Com 4 bits de informa
 |D5|Pino de dado|
 |D6|Pino de dado|
 |D7|Pino de dado|
-|BLA|Luz de fundo do display, VCC|
-|BLK|[Luz de fundo do display, GND](#Luz-de-fundo-do-display,-GND)|
+|BLA|Luz de fundo do display VCC|
+|BLK|[Luz de fundo do display GND](#Luz-de-fundo-do-display-GND)|
 #####  Contraste do display
 > 1 - É possível colocar um potenciômetro para regular a intensidade do contraste. 
 > 2 - Caso desnecessário, conecte o pino VO ao GND para obter o contraste máximo.
