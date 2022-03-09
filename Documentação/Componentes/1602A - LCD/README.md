@@ -3,7 +3,7 @@
 Esse display exibe informações em uma tela de 16x2 caracteres, em que um caractere possui uma resolução 5x10 pixels.
 ### Montagem
 Este display é capaz de trabalhar de 2 formas possíveis: Com 4 bits de informação ou 8 bits de informação. Cada bit vai requere uma porta digital no Arduino, você poderá utilizar 4 bits e assim economizar 4 portas digitais, o uso de 8 portas com 8 bits de informação é indicado para aplicações em que precise-se de uma atualização em tempo real realmente rápida no display.
-![lcd](lcd.jpeg)
+![lcd](lcd.png)
 |Pino|Função|
 |-|-|
 |GND|GND|
