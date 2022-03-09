@@ -26,17 +26,33 @@ Este display é capaz de trabalhar de 2 formas possíveis: Com 4 bits de informa
 > * É possível colocar um potenciômetro para regular a intensidade do contraste. 
 > * Caso desnecessário, conecte o pino VO ao GND para obter o contraste máximo.
 ##### Controle ler e escrever
-> Caso seja desnecessária a leitura de dados do display, este pino pode ser removido.
+> Caso seja desnecessária a leitura de dados do display, o pino RW pode ser removido.
 ##### Luz de fundo do display GND
 > Para porta VCC 5V do Arduino, use um resistor de 220Ω se não led **Irá queimar!**
 > Pode-se usar o resistor tanto no VCC quanto no GND.
 
 ### Consumo de corrente e voltagem
-Ele trabalha com uma voltagem na faixa de 3-5.5V, consumindo uma corrente de no máximo 2.5mAh.
+Ele trabalha com uma voltagem na faixa de 4.5-5.5V, consumindo uma corrente de no máximo 1.2mA.
 ### Consumo de memória flash e SRAM no Arduino Uno
-O Scketch padrão para teste do sensor fornecido pela bibliteca [<DHT.h>](https://www.arduino.cc/reference/en/libraries/dht-sensor-library/) consome 6728 bytes da memória flash, equivalente a 20% da capacidade total. Variáveis no Scketch consomem 219 bytes de memória SRAM, equivalente a 10% da capacidade total.
+O código de teste usado, utilizando a mínima quantidade de pinos possível (rs, e, d4, d5, d6, d7), além de obviamente os pinos que alimentam o LCD e o LED do LCD (GND, VDD, BLA, BLK) consumiu 1866 bytes da memória flash, que equivale a 5% da capacidade total, e consumiu 65 bytes de SRAM equivalendo a 3% da capacidade total.
 ### Bibliotecas utilizadas
-Para funcionamento do sensor, será necessária instalação da biblioteca [<DHT.h>](https://www.arduino.cc/reference/en/libraries/dht-sensor-library/) na Arduino IDE. O Scketch a seguir é um exemplo de como utilizá-la, este que é fornecido pela própria biblioteca na seção de exemplos:
+Para funcionamento display, será necessária instalação da biblioteca [<LiquidCrystal.h>](https://www.arduino.cc/reference/en/libraries/liquidcrystal/) na Arduino IDE. O Scketch a seguir é um exemplo de como utilizá-la:
+```
+#include <LiquidCrystal.h>
+
+//                rs  e   d4  d5  d6  d7
+LiquidCrystal lcd(4,  5,  6,  7,  8,  9);
+
+void setup() {
+  lcd.begin(16,2);
+  lcd.clear();
+  lcd.print("Hello world!!!");
+  lcd.setCursor(0, 1); // coluna linha
+  lcd.print("UFFS");
+}
+
+void loop() {
+  delay(99999999);
+}
 ```
 
-```

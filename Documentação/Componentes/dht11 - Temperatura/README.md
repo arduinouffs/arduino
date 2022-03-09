@@ -10,7 +10,7 @@ Há diferentes variantes deste mesmo sensor, por isso deve-se tomar cuidado com 
 |Nada informado|VCC|
 |\-|GND|
 ### Consumo de corrente e voltagem
-Ele trabalha com uma voltagem na faixa de 3-5.5V, consumindo uma corrente de no máximo 2.5mAh.
+Ele trabalha com uma voltagem na faixa de 3-5.5V, consumindo uma corrente de no máximo 2.5mA.
 ### Consumo de memória flash e SRAM no Arduino Uno
 O Scketch padrão para teste do sensor fornecido pela bibliteca [<DHT.h>](https://www.arduino.cc/reference/en/libraries/dht-sensor-library/) consome 6728 bytes da memória flash, equivalente a 20% da capacidade total. Variáveis no Scketch consomem 219 bytes de memória SRAM, equivalente a 10% da capacidade total.
 ### Bibliotecas utilizadas
