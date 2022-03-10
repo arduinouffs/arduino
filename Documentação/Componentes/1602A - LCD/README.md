@@ -55,4 +55,4 @@ void loop() {
   delay(99999999);
 }
 ```
-
+> Busque por "[1602A datasheet](https://www.google.com/search?q=1602A+datasheet)" ou "[1602A LCD datasheet](https://www.google.com/search?q=1602A+LCD+datasheet)" para mais informações sobre este componente.
