@@ -71,3 +71,4 @@ void loop() {
   }
 }
 ```
+> Busque por "[HW-236 Oled datasheet](https://www.google.com/search?q=HW-236+Oled+datasheet)" para mais informações sobre este componente.
