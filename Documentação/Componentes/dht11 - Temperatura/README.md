@@ -25,7 +25,7 @@ Para funcionamento do sensor, será necessária instalação da biblioteca [<DHT
 
 #include "DHT.h"
 
-#define DHTPIN 2     // Digital pin connected to the DHT sensor
+#define DHTPIN 7     // Digital pin connected to the DHT sensor
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
 // Pin 15 can work but DHT must be disconnected during program upload.
 
@@ -91,3 +91,4 @@ void loop() {
   Serial.println(F("°F"));
 }
 ```
+> Busque por "[dht11 datasheet](https://www.google.com/search?q=dht11+datasheet)" para mais informações sobre este componente.

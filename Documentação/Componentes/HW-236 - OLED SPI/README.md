@@ -15,7 +15,7 @@ Há diferentes versões do display oled, mudando a ordem e quantidade dos pinos(
 |DC (A0)|Pino de comando|
 |CS|Seleção de chip, Normalmente mantido baixo, usado apenas quando mais de um dispositivo SPI está conectado ao MCU|
 ### Consumo de corrente e voltagem
-Ele trabalha com uma voltagem na faixa de 3.3-5V, consumindo uma corrente de no máximo _undefined_.
+Ele trabalha com uma voltagem na faixa de 3.3-5V, consumindo uma corrente de no máximo 150mA.
 ### Consumo de memória flash e SRAM no Arduino Uno
 O Scketch utilizado para teste consumiu 8592 bytes de memória flash que equivale a 26% da capacidade total e consumiu 298 bytes da SRAM equivalendo a 14% da capacidade total.
 ### Bibliotecas utilizadas
@@ -71,3 +71,4 @@ void loop() {
   }
 }
 ```
+> Busque por "[HW-236 Oled datasheet](https://www.google.com/search?q=HW-236+Oled+datasheet)" para mais informações sobre este componente.
