@@ -91,3 +91,4 @@ void loop() {
   Serial.println(F("°F"));
 }
 ```
+> Busque por "[dht11 datasheet](https://www.google.com/search?q=dht11+datasheet)" para mais informações sobre este componente.
