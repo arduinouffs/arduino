@@ -20,7 +20,7 @@ Para funcionamento do sensor, será necessária instalação da biblioteca [<Emo
 #include "EmonLib.h" //INCLUSÃO DE BIBLIOTECA
 
 #define VOLT_CAL 440.7 //VALOR DE CALIBRAÇÃO (DEVE SER AJUSTADO EM PARALELO COM UM MULTÍMETRO)
-#define ZMPT101BPIN A3
+#define ZMPT101BPIN A0
 EnergyMonitor emon1; //CRIA UMA INSTÂNCIA
 
 void setup(){  
