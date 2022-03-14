@@ -1,3 +1,4 @@
+
 # ZMPT101B Voltímetro AC
 ### Introdução
 Este sensor é capaz de ler a voltagem numa faixa 0-250V de corrente alternada. 
@@ -13,14 +14,14 @@ Se desejar, faça a [calibração](https://blogmasterwalkershop.com.br/arduino/c
 ### Consumo de corrente e voltagem
 Ele trabalha com uma voltagem na faixa de 5-30V, consumindo uma corrente de no máximo 2mA.
 ### Consumo de memória flash e SRAM no Arduino Uno
-O Scketch usado para teste é uma variação do exemplo padrão fornecido pela biblioteca [<EmonLib.h>](https://github.com/openenergymonitor/EmonLib) configurado para a voltagem AC de tomada em 220V.
+O Scketch usado para teste é uma variação do exemplo padrão fornecido pela biblioteca [<EmonLib.h>](https://github.com/openenergymonitor/EmonLib) configurado para a voltagem AC de tomada em 220V. Consumiu 5430 bytes de memória flash equivalente a 16% da capacidade total e 292 bytes de SRAM equivalente a 14% da capacidade total.
 ### Bibliotecas utilizadas
 Para funcionamento do sensor, será necessária instalação da biblioteca [<EmonLib.h>](https://github.com/openenergymonitor/EmonLib) na Arduino IDE. O Scketch a seguir é um exemplo de como utilizá-la:
 ```
 #include "EmonLib.h" //INCLUSÃO DE BIBLIOTECA
 
 #define VOLT_CAL 440.7 //VALOR DE CALIBRAÇÃO (DEVE SER AJUSTADO EM PARALELO COM UM MULTÍMETRO)
-#define ZMPT101BPIN A0
+#define ZMPT101BPIN A3
 EnergyMonitor emon1; //CRIA UMA INSTÂNCIA
 
 void setup(){  
