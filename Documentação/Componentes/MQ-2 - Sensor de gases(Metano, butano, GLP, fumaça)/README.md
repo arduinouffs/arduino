@@ -17,7 +17,7 @@ Ele trabalha com uma voltagem na faixa de 3-5V, consumindo uma corrente de no m�
 O Scketch padrão para teste do sensor fornecido pela bibliteca [<MQ2.h>](https://github.com/labay11/MQ-2-sensor-library) consome 5842 bytes da memória flash, equivalente a 18%% da capacidade total. Variáveis no Scketch consomem 398 bytes de memória SRAM, equivalente a 19% da capacidade total.
 ### Bibliotecas utilizadas
 Para funcionamento do sensor, será necessária instalação da biblioteca [<MQ2.h>](https://github.com/labay11/MQ-2-sensor-library) (ou [<MQUnifiedsensor.h>](https://www.arduino.cc/reference/en/libraries/mqunifiedsensor/)) na Arduino IDE. O Scketch a seguir é um exemplo de como utilizá-la, este que é fornecido pela própria biblioteca na seção de exemplos:
-<pre lang="cpp"><code>
+```
 #include <MQ2.h>
 
 //change this with the pin that you use
@@ -53,5 +53,5 @@ void loop(){
   
   delay(1000);
 }
-</code></pre>
+```
 > Busque por "[MQ-2 datasheet](https://www.google.com/search?q=MQ-2+datasheet)" para mais informações sobre este componente.
