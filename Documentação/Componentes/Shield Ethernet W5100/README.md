@@ -4,7 +4,7 @@
 Esta placa fornece ao arduino a capacidade de conectar-se e realizar ações na rede.
 ### Montagem
 Basta encaixar os pinos corretamente ao arduino conforme a imagem.
-![ethernet](ethernet.jpg)
+![ethernet](ethernet.jpg) <br>
 É importante salientar que os pinos citados na tabela estarão reservados e não poderão ser utilizados.
 |Pino|Função|
 |-|-|
