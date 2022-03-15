@@ -12,85 +12,68 @@ Há diferentes variantes deste mesmo sensor, por isso deve-se tomar cuidado com 
 |GND|GND|
 |VCC|VCC|
 ### Consumo de corrente e voltagem
-Ele trabalha com uma voltagem na faixa de 3-5.5V, consumindo uma corrente de no máximo 2.5mA.
+Ele trabalha com uma voltagem na faixa de 3-5V, consumindo uma corrente de no máximo 150mA.
 ### Consumo de memória flash e SRAM no Arduino Uno
-O Scketch padrão para teste do sensor fornecido pela bibliteca [<DHT.h>](https://www.arduino.cc/reference/en/libraries/dht-sensor-library/) consome 6728 bytes da memória flash, equivalente a 20% da capacidade total. Variáveis no Scketch consomem 219 bytes de memória SRAM, equivalente a 10% da capacidade total.
+O Scketch padrão para teste do sensor fornecido pela bibliteca [<MQ135.h>](https://www.arduino.cc/reference/en/libraries/mq135/)  (também pode ser usada a biblioteca [<MQUnifiedsensor.h>](https://www.arduino.cc/reference/en/libraries/mqunifiedsensor/) no lugar) consumiu 6766 bytes de memória flash o que equivale a 20% da capacidade total, e 314 bytes da memória SRAM o que equivale a 15% capacidade total. Importante: no caso da biblioteca [<MQ135.h>](https://www.arduino.cc/reference/en/libraries/mq135/) é utilizada juntamente a biblioteca [<DHT.h>](https://www.arduino.cc/reference/en/libraries/dht-sensor-library/) para calibração das medições conforme a temperatura e umidade juntamente com o sensor (DHT11 ou DHT22).
 ### Bibliotecas utilizadas
-Para funcionamento do sensor, será necessária instalação da biblioteca [<DHT.h>](https://www.arduino.cc/reference/en/libraries/dht-sensor-library/) na Arduino IDE. O Scketch a seguir é um exemplo de como utilizá-la, este que é fornecido pela própria biblioteca na seção de exemplos:
+Para funcionamento do sensor, será necessária instalação da biblioteca [<DHT.h>](https://www.arduino.cc/reference/en/libraries/dht-sensor-library/) e [<MQ135.h>](https://www.arduino.cc/reference/en/libraries/mq135/) na Arduino IDE. O Scketch a seguir é um exemplo de como utilizá-la, este que é fornecido pela própria biblioteca na seção de exemplos:
 ```
-// Example testing sketch for various DHT humidity/temperature sensors
-// Written by ladyada, public domain
+#include <MQ135.h>
+#include <DHT.h>
 
-// REQUIRES the following Arduino libraries:
-// - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
-// - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
+/* MQ135 + DHT Temp Sensor
 
-#include "DHT.h"
+   Combination of the MQ135 air quality sensor and a DHT11/22 temperature sensor to accurately measure ppm values through the library correction.
+   Uses the Adafruit DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
 
-#define DHTPIN 7     // Digital pin connected to the DHT sensor
-// Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
-// Pin 15 can work but DHT must be disconnected during program upload.
+   Written by: https://github.com/Phoenix1747/MQ135
+*/
 
-// Uncomment whatever type you're using!
-#define DHTTYPE DHT11   // DHT 11
-//#define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
-//#define DHTTYPE DHT21   // DHT 21 (AM2301)
+#define PIN_MQ135 A2 // MQ135 Analog Input Pin
+#define DHTPIN 2 // DHT Digital Input Pin
+#define DHTTYPE DHT11 // DHT11 or DHT22, depends on your sensor
 
-// Connect pin 1 (on the left) of the sensor to +5V
-// NOTE: If using a board with 3.3V logic like an Arduino Due connect pin 1
-// to 3.3V instead of 5V!
-// Connect pin 2 of the sensor to whatever your DHTPIN is
-// Connect pin 3 (on the right) of the sensor to GROUND (if your sensor has 3 pins)
-// Connect pin 4 (on the right) of the sensor to GROUND and leave the pin 3 EMPTY (if your sensor has 4 pins)
-// Connect a 10K resistor from pin 2 (data) to pin 1 (power) of the sensor
-
-// Initialize DHT sensor.
-// Note that older versions of this library took an optional third parameter to
-// tweak the timings for faster processors.  This parameter is no longer needed
-// as the current DHT reading algorithm adjusts itself to work on faster procs.
+MQ135 mq135_sensor(PIN_MQ135);
 DHT dht(DHTPIN, DHTTYPE);
+
+float temperature, humidity; // Temp and Humid floats, will be measured by the DHT
 
 void setup() {
   Serial.begin(9600);
-  Serial.println(F("DHTxx test!"));
 
   dht.begin();
 }
 
 void loop() {
-  // Wait a few seconds between measurements.
-  delay(2000);
-
-  // Reading temperature or humidity takes about 250 milliseconds!
-  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-  float h = dht.readHumidity();
-  // Read temperature as Celsius (the default)
-  float t = dht.readTemperature();
-  // Read temperature as Fahrenheit (isFahrenheit = true)
-  float f = dht.readTemperature(true);
+  humidity = dht.readHumidity();
+  temperature = dht.readTemperature();
 
   // Check if any reads failed and exit early (to try again).
-  if (isnan(h) || isnan(t) || isnan(f)) {
+  if (isnan(humidity) || isnan(temperature)) {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
 
-  // Compute heat index in Fahrenheit (the default)
-  float hif = dht.computeHeatIndex(f, h);
-  // Compute heat index in Celsius (isFahreheit = false)
-  float hic = dht.computeHeatIndex(t, h, false);
+  float rzero = mq135_sensor.getRZero();
+  float correctedRZero = mq135_sensor.getCorrectedRZero(temperature, humidity);
+  float resistance = mq135_sensor.getResistance();
+  float ppm = mq135_sensor.getPPM();
+  float correctedPPM = mq135_sensor.getCorrectedPPM(temperature, humidity);
 
-  Serial.print(F("Humidity: "));
-  Serial.print(h);
-  Serial.print(F("%  Temperature: "));
-  Serial.print(t);
-  Serial.print(F("°C "));
-  Serial.print(f);
-  Serial.print(F("°F  Heat index: "));
-  Serial.print(hic);
-  Serial.print(F("°C "));
-  Serial.print(hif);
-  Serial.println(F("°F"));
+  Serial.print("MQ135 RZero: ");
+  Serial.print(rzero);
+  Serial.print("\t Corrected RZero: ");
+  Serial.print(correctedRZero);
+  Serial.print("\t Resistance: ");
+  Serial.print(resistance);
+  Serial.print("\t PPM: ");
+  Serial.print(ppm);
+  Serial.print("ppm");
+  Serial.print("\t Corrected PPM: ");
+  Serial.print(correctedPPM);
+  Serial.println("ppm");
+
+  delay(300);
 }
 ```
-> Busque por "[dht11 datasheet](https://www.google.com/search?q=dht11+datasheet)" para mais informações sobre este componente.
+> Busque por "[MQ-135 datasheet](https://www.google.com/search?q=MQ-135+datasheet)" para mais informações sobre este componente.

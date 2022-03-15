@@ -43,6 +43,6 @@ void loop(){
   delay(1000);
 }
 ```
-> Busque por "[dht11 datasheet](https://www.google.com/search?q=dht11+datasheet)" para mais informações sobre este componente.
+> Busque por "[ZMPT101B datasheet](https://www.google.com/search?q=ZMPT101B+datasheet)" para mais informações sobre este componente.
 
 > Leia o [artigo sigerido](https://blogmasterwalkershop.com.br/arduino/como-usar-com-arduino-sensor-de-tensao-ac-0-a-250v-voltimetro-zmpt101b) para saber como realizar calibração usando um osciloscópio para obter maior precisão nas medições de corrente alternada AC.
