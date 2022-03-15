@@ -4,7 +4,7 @@
 Este sensor é capaz de ler a presença dos gases metano, butano, GLP e fumaça.
 ### Montagem
 Há diferentes variantes deste mesmo sensor, por isso deve-se tomar cuidado com a pinagem. Neste caso foi utilizado a versão de 4 pinos soldada em uma placa: 
-![dht11](dht11.png)
+![mq2](mq2.webp)
 |Pino|Função|
 |-|-|
 |GND|GND|
