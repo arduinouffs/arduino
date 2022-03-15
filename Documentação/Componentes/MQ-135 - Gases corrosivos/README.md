@@ -3,7 +3,7 @@
 ### Introdução
 Este sensor é capaz de ler a presença de gases corrosivos (amônia, dióxido de carbono, benzeno, óxido nítrico, fumaça ou álcool, etc).
 ### Montagem
-Há diferentes variantes deste mesmo sensor, por isso deve-se tomar cuidado com a pinagem. Neste caso foi utilizado a versão de 4 pinos soldada em uma placa: 
+Há diferentes variantes deste mesmo sensor, por isso deve-se tomar cuidado com a pinagem. Neste caso foi utilizado a versão de 4 pinos soldada em uma placa: <br>
 ![mq135](mq135.webp)
 |Pino|Função|
 |-|-|
