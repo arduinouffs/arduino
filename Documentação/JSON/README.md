@@ -13,7 +13,7 @@ client.println();
 
 ### Construção do JSON
 À partir do objeto ```EthernetClient client = server.available()``` é utilizado o ```client.print()``` ou ```client.println()``` para gerar o arquivo, sendo que a variação "ln" do print é acompanhada automaticamente do caractere "\n".
-[json](json.png)[json](jsonimg.png)
+![json](json.png)![json](jsonimg.png)
 "\n" 's são usados para quebra de linha, e "\t" 's são usados para distanciar o objeto da esquerda conforme necessário para que se obtenha a correta indentação, por exemplo:
 ```{\n\t\"temperatura\": "); client.print(dht.readTemperature();``` obtém 
 
