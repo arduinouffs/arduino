@@ -52,16 +52,17 @@ void setup() {
     dht.begin();
     mq2.begin();
     emon1.voltage(VOLTPIN, VOLT_CAL, 1.7);
-    for (int i = 50; i > 0; i--) {
-      lcd.clear();
-      lcd.print("IP local:");
-      lcd.setCursor(0,1);
-      lcd.print(Ethernet.localIP());
-      lcd.setCursor(13,0);
-      lcd.print(i);
-      lcd.print("s");
-      delay(1000);
-    }
+    Serial.println(Ethernet.localIP());
+//    for (int i = 50; i > 0; i--) {
+//      lcd.clear();
+//      lcd.print("IP local:");
+//      lcd.setCursor(0,1);
+//      lcd.print(Ethernet.localIP());
+//      lcd.setCursor(13,0);
+//      lcd.print(i);
+//      lcd.print("s");
+//      delay(1000);
+//    }
 } // fim do setup
 
 void loop() {
@@ -91,9 +92,8 @@ void loop() {
                 if (c == '\n' && currentLineIsBlank) {  
                     // ENVIA A PÁGINA WEB
                     client.println("HTTP/1.1 200 OK");
-//                    client.println("Content-Type: text/html");
                     client.println("Content-Type: aplication/json");
-//                    client.println("Connection: keep-alive");
+                    client.println("Content-Disposition: attachment ; filename = \"data.json\"");
                     client.println("Connection: close");
                     client.println();
 
