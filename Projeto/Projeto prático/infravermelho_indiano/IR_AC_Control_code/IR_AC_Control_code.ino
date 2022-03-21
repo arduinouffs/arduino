@@ -4,24 +4,24 @@
  *  capture the values. They will print in the serial monitor. Then you
  *  cut and paste that output into the appropriate section below.
  */
-#include <IRLibSendBase.h>    //We need the base code
+#include <IRLibSendBase.h>    //We need the base code/
 #include <IRLib_HashRaw.h>    //Only use raw sender
-#include <PushButton.h>
+//#include <PushButton.h>
 
 #define pinLiga 4
 #define pinDesliga 5
 
 IRsendRaw mySender;
-PushButton botaoLiga(pinLiga);
-PushButton botaoDesliga(pinDesliga);
+//PushButton botaoLiga(pinLiga);
+//PushButton botaoDesliga(pinDesliga);
 
 void setup() {
   Serial.begin(9600);
   delay(2000); 
 //  while (!Serial); //delay for Leonardo/
   Serial.println("DHT11 Humidity & temperature Sensor\n\n");
-  pinMode(pinLiga, INPUT_PULLUP);
-  pinMode(pinDesliga, INPUT_PULLUP);
+//  pinMode(pinLiga, INPUT_PULLUP);
+//  pinMode(pinDesliga, INPUT_PULLUP);
 }
 /* Cut and paste the output from "rawRecv.ino" below here. It will 
  * consist of a #define RAW_DATA_LEN statement and an array definition
@@ -29,7 +29,7 @@ void setup() {
  * with "…,1000};"
  */
 #define RAW_DATA_LEN 350
-uint16_t rawDataOff[RAW_DATA_LEN]={
+unsigned int rawDataOff[RAW_DATA_LEN]={
   510, 1702, 474, 1730, 494, 1702, 422, 1762, 
   510, 1698, 514, 1694, 494, 1674, 514, 1718, 
   454, 666, 490, 634, 454, 682, 490, 630, 
@@ -57,7 +57,7 @@ uint16_t rawDataOff[RAW_DATA_LEN]={
   438, 7498, 434, 1000};
 
 #define RAW_DATA_LEN 350
-uint16_t rawDataOn[RAW_DATA_LEN]={
+unsigned int rawDataOn[RAW_DATA_LEN]={
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
   466, 1766, 394, 1770, 466, 1726, 434, 1774, 
   466, 1718, 470, 670, 446, 702, 446, 670, 
@@ -89,17 +89,19 @@ uint16_t rawDataOn[RAW_DATA_LEN]={
  */
    
 void loop() {
-  botaoLiga.button_loop();
-  botaoDesliga.button_loop();
-  
-  if (botaoDesliga.pressed()) {
+//  botaoLiga.button_loop();
+//  botaoDesliga.button_loop();
+//  
+//  if (botaoDesliga.pressed()) {
     mySender.send(rawDataOff,RAW_DATA_LEN,36);//Pass the buffer,length, optionally frequency
     Serial.println(F("AC Switched Off"));
-  }
-  if (botaoLiga.pressed()) {
-    mySender.send(rawDataOn,RAW_DATA_LEN,36);//Pass the buffer,length, optionally frequency
-    Serial.println(F("AC Switched On"));
-  }
+//  }
+
+   delay(1000);
+//  if (botaoLiga.pressed()) {
+//    mySender.send(rawDataOn,RAW_DATA_LEN,36);//Pass the buffer,length, optionally frequency
+//    Serial.println(F("AC Switched On"));
+//  }
 
   
 }
