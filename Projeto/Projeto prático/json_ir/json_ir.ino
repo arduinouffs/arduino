@@ -11,7 +11,7 @@
 #define DHTPIN A1 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
 #define MQ2PIN A2
-#define pin2 3
+#define pin2 4
 #define pin1 2
 #define VOLTPIN A3
 #define VOLT_CAL 440.7
@@ -111,6 +111,8 @@ LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
 IRsendRaw mySender;
 
 void setup() {  
+    pinMode(7, OUTPUT);
+    digitalWrite(7, 1);
     Serial.begin(9600);
     Ethernet.begin(mac); 
     lcd.createChar(0, grau);
