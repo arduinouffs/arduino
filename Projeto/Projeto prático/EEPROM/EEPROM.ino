@@ -64,11 +64,7 @@ void setup () {
 void loop () {
   int novo[198];
   readIntArrayFromEEPROM(0, novo, 198);
-//  int neww[RAW_DATA_LEN];
-//  readIntArrayFromEEPROM(RAW_DATA_LEN, neww, RAW_DATA_LEN);
 
   for (int i = 0; i < 198; i++) Serial.println(novo[i]);
-//  Serial.println("==============================================================================");
-//  for (int i = RAW_DATA_LEN; i < RAW_DATA_LEN*2; i++) Serial.println(neww[i]);
   delay(999999999);
 }

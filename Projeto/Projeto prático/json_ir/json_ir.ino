@@ -16,8 +16,7 @@
 #define VOLTPIN A3
 #define VOLT_CAL 440.7
 
-void readIntArrayFromEEPROM(int address, int numbers[], int arraySize)
-{
+void readIntArrayFromEEPROM(int address, int numbers[], int arraySize){
   int addressIndex = address;
   for (int i = 0; i < arraySize; i++)
   {
@@ -144,14 +143,6 @@ void loop() {
       lcd.print(int(dht.readHumidity()));
       lcd.print("%");
       tempoDisplay = millis() + 10000;
-
-//      if (dht.readTemperature() > 26) {
-//        mySender.send(rawDataOn,RAW_DATA_LEN,36);
-//      }
-//
-//      if (dht.readTemperature() <= 21) {
-//        mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//      }
 
       if (dht.readTemperature() > 26) {
         uint16_t rawDataOn[198];
