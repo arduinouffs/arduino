@@ -26,7 +26,7 @@ Este display é capaz de trabalhar de 2 formas possíveis: Com 4 bits de informa
 > * É possível colocar um potenciômetro para regular a intensidade do contraste. 
 > * Caso desnecessário, conecte o pino VO ao GND para obter o contraste máximo.
 ##### Controle ler e escrever
-> Caso seja desnecessária a leitura de dados do display, o pino RW pode ser removido.
+> Caso seja desnecessária a leitura de dados do display, o pino RW pode ser ligado ao GND e ficará sempre em modo escrita.
 ##### Luz de fundo do display GND
 > Para porta VCC 5V do Arduino, use um resistor de 220Ω se não led **Irá queimar!**
 > Pode-se usar o resistor tanto no VCC quanto no GND.
