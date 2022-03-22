@@ -14,7 +14,7 @@ Da esquerda para a direita, em pé olhando pelo lado de trás(as cores dos fios 
 |Fio 3|Vout1 (PM2.5)|
 |Fio 4|GND|
 
-Vout1 conectado ao pino D3, Vout2 conectado ao pino D4.
+Vout1 conectado ao pino D2, Vout2 conectado ao pino D4.
 ### Consumo de corrente e voltagem
 Ele trabalha com uma voltagem de 5V, consumindo uma corrente de no máximo 90mA.
 ### Consumo de memória flash e SRAM no Arduino Uno
