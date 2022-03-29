@@ -4,11 +4,7 @@
 O leitor de infravermelho para o Arduino com 3 pinos é usado no projeto para clonar o controle remoto do Ar Condicionado. Após feitas corretamente as configurações no controle para o que se espera quando liga o ar condicionado, clone a Liga e o Desliga.
 ### Montagem
 Neste caso foi usado a versão de 3 pinos, há também o de 2 pinos apenas:
-<div style="display: grid; grid-template-columns: repeat(3, 1fr)">
-  <img src="a.webp" alt="A"> 
-  <img src="b.jpg" alt="B">
-  <img src="c.jpg" alt="C">
-</div>
+![a](a.webp) ![b](b.jpg) ![c](c.jpg)
 
 ### Consumo de corrente e voltagem
 Ele trabalha com uma voltagem na faixa de 2.7-5.5V, consumindo uma corrente de no máximo 1.5mA.
