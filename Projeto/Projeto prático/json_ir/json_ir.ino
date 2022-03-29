@@ -111,8 +111,6 @@ LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
 IRsendRaw mySender;
 
 void setup() {  
-    pinMode(7, OUTPUT);
-    digitalWrite(7, 1);
     Serial.begin(9600);
     Ethernet.begin(mac); 
     lcd.createChar(0, grau);
@@ -122,6 +120,7 @@ void setup() {
     mq2.begin();
     emon1.voltage(VOLTPIN, VOLT_CAL, 1.7);
     Serial.println(Ethernet.localIP());
+    Serial.println("Ethernet");
 //    for (int i = 50; i > 0; i--) {
 //      lcd.clear();
 //      lcd.print("IP local:");
@@ -144,7 +143,7 @@ void loop() {
       lcd.print("Umidade:     ");
       lcd.print(int(dht.readHumidity()));
       lcd.print("%");
-      tempoDisplay = millis() + 10000;
+      tempoDisplay = millis() + 60000;
 
       if (dht.readTemperature() > 26) {
         uint16_t rawDataOn[198];
@@ -155,10 +154,8 @@ void loop() {
       if (dht.readTemperature() <= 21) {
         mySender.send(rawDataOff,RAW_DATA_LEN,36);
       }
-    }
-    if (millis() > tempoRenvIP) {
+
       Ethernet.maintain();
-      tempoRenvIP = millis() + 600000; // 10 minutos
     }
     
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
