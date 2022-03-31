@@ -111,6 +111,7 @@ LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
 IRsendRaw mySender;
 
 void setup() {  
+//  IPAddress ip(172, 20, 66, 10);
     Serial.begin(9600);
     Ethernet.begin(mac); 
     lcd.createChar(0, grau);
@@ -159,7 +160,8 @@ void loop() {
     }
     
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
-    if (client) {  // Existe um cliente em conexão ?        
+    if (client) {  // Existe um cliente em conexão ?       
+        Serial.println("Existe"); 
         boolean currentLineIsBlank = true;
         while (client.connected()) {          
             if (client.available()) {
