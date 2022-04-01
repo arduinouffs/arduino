@@ -3,10 +3,10 @@
 #include <DHT.h>
 #include <MQ2.h>
 #include <EmonLib.h>
-#include <LiquidCrystal.h>
+#include <LiquidCrystal.h>/
 #include <IRLibSendBase.h>
 #include <IRLib_HashRaw.h>
-#include <EEPROM.h>
+//#include <EEPROM.h>
 
 #define DHTPIN A1 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
@@ -16,17 +16,17 @@
 #define VOLTPIN A3
 #define VOLT_CAL 440.7
 
-void readIntArrayFromEEPROM(int address, int numbers[], int arraySize){
-  int addressIndex = address;
-  for (int i = 0; i < arraySize; i++)
-  {
-    numbers[i] = (EEPROM.read(addressIndex) << 8) + EEPROM.read(addressIndex + 1);
-    addressIndex += 2;
-  }
-}
+//void readIntArrayFromEEPROM(int address, int numbers[], int arraySize){
+//  int addressIndex = address;
+//  for (int i = 0; i < arraySize; i++)
+//  {
+//    numbers[i] = (EEPROM.read(addressIndex) << 8) + EEPROM.read(addressIndex + 1);
+//    addressIndex += 2;
+//  }
+//}
 
 #define RAW_DATA_LEN 350
-uint16_t rawDataOff[RAW_DATA_LEN]={
+const PROGMEM uint16_t PROGMEM rawDataOff[RAW_DATA_LEN]={ // variável constante salva na flash
   510, 1702, 474, 1730, 494, 1702, 422, 1762, 
   510, 1698, 514, 1694, 494, 1674, 514, 1718, 
   454, 666, 490, 634, 454, 682, 490, 630, 
@@ -52,35 +52,34 @@ uint16_t rawDataOff[RAW_DATA_LEN]={
   438, 1770, 438, 682, 438, 1770, 438, 682, 
   438, 1770, 414, 706, 438, 1770, 414, 1774, 
   438, 7498, 434, 1000};
-//uint16_t rawDataOn[RAW_DATA_LEN]={
-//  5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
-//  466, 1766, 394, 1770, 466, 1726, 434, 1774, 
-//  466, 1718, 470, 670, 446, 702, 446, 670, 
-//  398, 746, 470, 646, 482, 666, 446, 670, 
-//  470, 646, 442, 1750, 494, 1710, 422, 1770, 
-//  494, 1698, 414, 1790, 498, 1694, 470, 1734, 
-//  498, 1690, 542, 622, 478, 642, 478, 638, 
-//  498, 646, 506, 614, 434, 710, 506, 610, 
-//  486, 658, 486, 1678, 538, 1670, 506, 1678, 
-//  478, 1754, 478, 1706, 482, 1726, 454, 1734, 
-//  482, 1706, 474, 666, 482, 642, 442, 694, 
-//  482, 638, 446, 694, 454, 666, 450, 694, 
-//  450, 666, 450, 1762, 454, 662, 478, 642, 
-//  470, 1738, 450, 1762, 446, 670, 450, 1738, 
-//  446, 1762, 450, 670, 446, 1762, 450, 1738, 
-//  442, 698, 450, 670, 446, 1762, 446, 674, 
-//  446, 694, 450, 670, 446, 1762, 446, 674, 
-//  446, 1762, 446, 1738, 446, 698, 442, 1742, 
-//  446, 1742, 466, 1742, 442, 678, 462, 1746, 
-//  442, 678, 438, 702, 442, 1746, 438, 706, 
-//  438, 682, 434, 730, 414, 1746, 438, 730, 
-//  414, 1746, 438, 730, 410, 1750, 434, 734, 
-//  410, 706, 414, 1794, 414, 706, 414, 1794, 
-//  414, 706, 414, 1770, 438, 706, 414, 1770, 
-//  414, 1794, 414, 7550, 414, 1000};
+const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={ // variável constante salva na flash
+  5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
+  466, 1766, 394, 1770, 466, 1726, 434, 1774, 
+  466, 1718, 470, 670, 446, 702, 446, 670, 
+  398, 746, 470, 646, 482, 666, 446, 670, 
+  470, 646, 442, 1750, 494, 1710, 422, 1770, 
+  494, 1698, 414, 1790, 498, 1694, 470, 1734, 
+  498, 1690, 542, 622, 478, 642, 478, 638, 
+  498, 646, 506, 614, 434, 710, 506, 610, 
+  486, 658, 486, 1678, 538, 1670, 506, 1678, 
+  478, 1754, 478, 1706, 482, 1726, 454, 1734, 
+  482, 1706, 474, 666, 482, 642, 442, 694, 
+  482, 638, 446, 694, 454, 666, 450, 694, 
+  450, 666, 450, 1762, 454, 662, 478, 642, 
+  470, 1738, 450, 1762, 446, 670, 450, 1738, 
+  446, 1762, 450, 670, 446, 1762, 450, 1738, 
+  442, 698, 450, 670, 446, 1762, 446, 674, 
+  446, 694, 450, 670, 446, 1762, 446, 674, 
+  446, 1762, 446, 1738, 446, 698, 442, 1742, 
+  446, 1742, 466, 1742, 442, 678, 462, 1746, 
+  442, 678, 438, 702, 442, 1746, 438, 706, 
+  438, 682, 434, 730, 414, 1746, 438, 730, 
+  414, 1746, 438, 730, 410, 1750, 434, 734, 
+  410, 706, 414, 1794, 414, 706, 414, 1794, 
+  414, 706, 414, 1770, 438, 706, 414, 1770, 
+  414, 1794, 414, 7550, 414, 1000};
 
 unsigned long tempoDisplay = 0;
-unsigned long tempoRenvIP = 0;
 unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long duration1;
 unsigned long duration2;
@@ -88,8 +87,8 @@ unsigned long lowpulseoccupancy1 = 0;
 unsigned long lowpulseoccupancy2 = 0;
 float ratio1 = 0;
 float ratio2 = 0;
-float concentration1 = 0;
-float concentration2 = 0;
+float pm2p5 = 0;
+float pm10 = 0;
 byte grau[8] = {
   B11100,
   B10100,
@@ -105,7 +104,8 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 EthernetServer server(80);     // Cria um servidor WEB
 DHT dht(DHTPIN, DHTTYPE);
 MQ2 mq2(MQ2PIN);
-EnergyMonitor emon1;
+EnergyMonitor tensao_entrada_nobreak;
+EnergyMonitor tensao_saida_nobreak;
 //                rs  e   d4  d5   d6   d7
 LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
 IRsendRaw mySender;
@@ -113,15 +113,21 @@ IRsendRaw mySender;
 void setup() {  
 //  IPAddress ip(172, 20, 66, 10);
     Serial.begin(9600);
-    Ethernet.begin(mac); 
+    if (Ethernet.begin(mac) == 0) {
+       Serial.println("DHCP FAILED");
+    } else {
+      Serial.println("DHCP DONE");
+    }
     lcd.createChar(0, grau);
     lcd.begin(16,2);
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
-    emon1.voltage(VOLTPIN, VOLT_CAL, 1.7);
+    tensao_entrada_nobreak.voltage(VOLTPIN, VOLT_CAL, 1.7);
+    tensao_saida_nobreak.voltage(VOLTPIN, VOLT_CAL, 1.7);
     Serial.println(Ethernet.localIP());
     Serial.println("Ethernet");
+//    Ethernet.maintain();
 //    for (int i = 50; i > 0; i--) {
 //      lcd.clear();
 //      lcd.print("IP local:");
@@ -147,9 +153,9 @@ void loop() {
       tempoDisplay = millis() + 60000;
 
       if (dht.readTemperature() > 26) {
-        uint16_t rawDataOn[198];
-        readIntArrayFromEEPROM(0, rawDataOn, 198);
-        mySender.send(rawDataOn,198,36);
+//        uint16_t rawDataOn[198];
+//        readIntArrayFromEEPROM(0, rawDataOn, 198);
+        mySender.send(rawDataOn,RAW_DATA_LEN,36);
       }
 
       if (dht.readTemperature() <= 21) {
@@ -161,7 +167,7 @@ void loop() {
     
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
     if (client) {  // Existe um cliente em conexão ?       
-        Serial.println("Existe"); 
+        Serial.println("Send"); 
         boolean currentLineIsBlank = true;
         while (client.connected()) {          
             if (client.available()) {
@@ -181,42 +187,59 @@ void loop() {
                     lowpulseoccupancy2 = lowpulseoccupancy2+duration2;
 
                     ratio1 = lowpulseoccupancy1/(sampletime_ms*10.0);  // Integer percentage 0=>100
-                    concentration1 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; // using spec sheet curve
+                    pm2p5 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; // using spec sheet curve
                   
                     ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
-                    concentration2 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
+                    pm10 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
 
-                    emon1.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
+                    tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
+                    tensao_saida_nobreak.calcVI(17,2000);
   
-                    client.print("{\n\t\"temperatura\": ");
-                    client.print(dht.readTemperature());
-                    client.print(",\n\t\"umidade\": ");
-                    client.print(dht.readHumidity());
-                    client.print(",\n\t\"gas inflamavel\": ");
-                    client.print(mq2.readLPG());
-                    client.print(",\n\t\"CO2\": ");
-                    client.print(mq2.readCO());
-                    client.print(",\n\t\"fumaca\": ");
-                    client.print(mq2.readSmoke());
-                    client.print(",\n\t\"ar\": {\n\t\t\"concentracao1\": ");
-                    client.print(concentration1);
-                    client.print(" pcs/0.01cf,\n\t\t\"concentracao2\": ");
-                    client.print(concentration2);
-                    client.print(" pcs/0.01cf,\n\t\t\"consideracao de ar\": ");
-                    if (concentration1 < 1000) {
-                     client.print("CLEAN");
-                    } else if (concentration1 > 1000 && concentration1 < 10000) {
-                     client.print("GOOD");
-                    } else if (concentration1 > 10000 && concentration1 < 20000) {      
+//                    client.print(dht.readTemperature());
+//                    client.print(dht.readHumidity());
+//                    client.print(mq2.readLPG());
+//                    client.print(mq2.readCO());
+//                    client.print(mq2.readSmoke());
+//                    client.print(pm2p5);
+//                    client.print(pm10);
+//                    client.print(tensao_entrada_nobreak.Vrms);
+
+                    String request = "";
+                    request += "{\"temperatura\": \"";
+                    request += dht.readTemperature();
+                    request += "\",\"umidade\": \"";
+                    request += dht.readHumidity();
+                    request += "\",\"gas_inflamavel\": \"";
+                    request += mq2.readLPG();
+//                    request += "nan";
+                    request += "\",\"CO2\": \"";
+                    request += mq2.readCO();
+//                    request += "nan";
+                    request += "\",\"fumaca\": \"";
+                    request += mq2.readSmoke();
+//                    request += "nan";
+                    request += "\",\"ar\": {\"concentracao_pm2p5\": \"";
+                    request += pm2p5;
+                    request += "\",\"concentracao_pm10\": \"";
+                    request += pm10;
+                    request += "\",\"consideracao_ar\": \"";
+                    if (pm2p5 < 1000) {
+                     request += "CLEAN";
+                    } else if (pm2p5 > 1000 && pm2p5 < 10000) {
+                     request += "GOOD";
+                    } else if (pm2p5 > 10000 && pm2p5 < 20000) {      
                      client.print("ACCEPTABLE");
-                    } else if (concentration1 > 20000 && concentration1 < 50000) {
+                    } else if (pm2p5 > 20000 && pm2p5 < 50000) {
                      client.print("HEAVY");
-                    } else {   // (concentration1 > 50000 )
+                    } else {   // (pm2p5 > 50000 )
                      client.print("HAZARD");  
                     }
-                    client.print("\n\t},\n\t\"voltagem\": ");
-                    client.print(emon1.Vrms);
-                    client.print("\n}");
+                    request += "\"},\"tensao_entrada_nobreak\": \"";
+                    request += tensao_entrada_nobreak.Vrms;
+                    request += "\",\"tensao_saida_nobreak\": \"";
+                    request += tensao_saida_nobreak.Vrms;
+                    request += "\"}";
+                    client.print(request);
 
                     lowpulseoccupancy1 = 0;
                     lowpulseoccupancy2 = 0;

@@ -1,23 +1,3 @@
-/*
-  SD card read/write
-
-  This example shows how to read and write data to and from an SD card file
-  The circuit:
-   SD card attached to SPI bus as follows:
- ** MOSI - pin 11
- ** MISO - pin 12
- ** CLK - pin 13
- ** CS - pin 4 (for MKRZero SD: SDCARD_SS_PIN)
-
-  created   Nov 2010
-  by David A. Mellis
-  modified 9 Apr 2012
-  by Tom Igoe
-
-  This example code is in the public domain.
-
-*/
-
 #include <SPI.h>
 #include <SD.h>
 #include <IRLibSendBase.h>
@@ -25,10 +5,6 @@
 
 File myFile;
 IRsendRaw mySender;
-
-uint16_t rawData[350];
-
-void readSD(uint16_t *rawData[350], String entrada);
 
 void setup() {
   // Open serial communications and wait for port to open:
@@ -43,32 +19,22 @@ void setup() {
     Serial.println("initialization failed!");
     while (1);
   }
-  Serial.println("initialization done.");
-  
-//  readSD(rawData[350], "KOMECCO,OFF,196");/
-
-  for (int j = 0; j < 350; j++) {
-    Serial.println(rawData[j]);
-  }
+  Serial.println("initialization done.");  
 }
 
 void loop() {
-  // nothing happens after setup
-  delay(2000);
-  mySender.send(rawData,350,36);
-}
-
-void readSD(uint16_t *rawData[350], String entrada){
-//  for (int i = 0; i < 350; i++) rawData[i] = 0;///
+  uint16_t rawData[350];
+  for (int j = 0; j < 350; j++) {
+    rawData[j] = 0;
+  }
   String string = "";
-//  String entrada = "KOMECCO,OFF,196";/
+  String entrada = "KOMECCO,OFF,196";
   bool chave = false;
   bool id = true;
   bool copy = false;
   int i = 0;
   myFile = SD.open("comandos.txt");
   if (myFile) {
-    Serial.println("comandos.txt:");
     while (myFile.available()) {
       char c = myFile.read();
       if (c == '{') {
@@ -96,6 +62,7 @@ void readSD(uint16_t *rawData[350], String entrada){
         if (c != ',') string += c;
         else {
           rawData[i] = string.toInt();
+          Serial.println(string);
           string = "";
           i++;
         }
@@ -106,5 +73,10 @@ void readSD(uint16_t *rawData[350], String entrada){
     myFile.close();
   } else {
     Serial.println("error opening comandos.txt");
+  }  
+  
+  for (int j = 0; j < 350; j++) {
+    Serial.println(rawData[j]);
   }
+  delay(9999999);
 }
