@@ -57,7 +57,7 @@ void setup() {
   if(isinf(calcR0)) {Serial.println("MQ-9: Warning: Conection issue founded, R0 is infite (Open circuit detected) please check your wiring and supply"); while(1);}
   if(calcR0 == 0){Serial.println("MQ-9: Warning: Conection issue founded, R0 is zero (Analog MQ2_PIN with short circuit to ground) please check your wiring and supply"); while(1);}
   dht.begin();
-  Serial.print("MQ-7: CO2,MQ-9: CO2,MQ-9: GLP,MQ-9: CH4,MQ-2: GLP, MQ-2: CO2,MQ-2: Fumaça,MQ-135: rzero,MQ-135: correctedRZero,MQ-135: resistance,MQ-135: ppm,MQ-135: correctedPPM,DSM501A: PM2.5,DSM501A: PM10, DSM501A: Consideração\n");
+  Serial.print("MQ-7: CO2,MQ-9: CO2,MQ-9: GLP,MQ-9: CH4,MQ-2: GLP, MQ-2: CO2,MQ-2: Fumaça,MQ-135: rzero,MQ-135: correctedRZero,MQ-135: resistance,MQ-135: ppm,MQ-135: correctedPPM,DSM501A: PM2.5,DSM501A: PM10,DSM501A: Consideração,DHT11: Temperatura,DHT11: Umidade\n");
 }
 
 void loop() {
@@ -157,10 +157,14 @@ void loop() {
   if (concentration1 > 50000 ) {   
    Serial.print("HAZARD");        
   } 
+  Serial.print(",");
 
-  Serial.println();
   lowpulseoccupancy1 = 0;
   lowpulseoccupancy2 = 0;
+
+  //  Serial.println("\n***************************************DHT11**************************************");
+  Serial.print(dht.readTemperature()); Serial.print(","); Serial.print(dht.readHumidity());
   
-  delay(5000);
+  Serial.println();
+  delay(30000);
 }

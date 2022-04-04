@@ -6,6 +6,8 @@
 File myFile;
 IRsendRaw mySender;
 
+void readSD(uint16_t *rawData[], String entrada);
+
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
@@ -23,17 +25,33 @@ void setup() {
 }
 
 void loop() {
+  // nothing happens after setup
+  delay(2000);
   uint16_t rawData[350];
+//  for (int j = 0; j < 350; j++) {
+//    Serial.println(rawData[j]);
+//  }
   for (int j = 0; j < 350; j++) {
     rawData[j] = 0;
   }
+//  mySender.send(rawData,350,36);
+  Serial.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  readSD(&rawData[350], "KOMECCO,OFF,196");
+
+  for (int j = 0; j < 350; j++) {
+    Serial.println(rawData[j]);
+  }
+  delay(9999999);
+}
+
+void readSD(uint16_t rawData[], String entrada){  
   String string = "";
-  String entrada = "KOMECCO,OFF,196";
   bool chave = false;
   bool id = true;
   bool copy = false;
   int i = 0;
   myFile = SD.open("comandos.txt");
+  Serial.println(myFile);
   if (myFile) {
     while (myFile.available()) {
       char c = myFile.read();
@@ -74,9 +92,4 @@ void loop() {
   } else {
     Serial.println("error opening comandos.txt");
   }  
-  
-  for (int j = 0; j < 350; j++) {
-    Serial.println(rawData[j]);
-  }
-  delay(9999999);
 }

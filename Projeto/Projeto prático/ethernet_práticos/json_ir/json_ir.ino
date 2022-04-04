@@ -1,9 +1,11 @@
 #include <SPI.h>
 #include <Ethernet.h>
+//#include <SD.h>
 #include <DHT.h>
 #include <MQ2.h>
 #include <EmonLib.h>
-#include <LiquidCrystal.h>/
+//#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 #include <IRLibSendBase.h>
 #include <IRLib_HashRaw.h>
 //#include <EEPROM.h>
@@ -26,7 +28,7 @@
 //}
 
 #define RAW_DATA_LEN 350
-const PROGMEM uint16_t PROGMEM rawDataOff[RAW_DATA_LEN]={ // variável constante salva na flash
+const PROGMEM uint16_t PROGMEM rawDataOff[196]={ // variável constante salva na flash
   510, 1702, 474, 1730, 494, 1702, 422, 1762, 
   510, 1698, 514, 1694, 494, 1674, 514, 1718, 
   454, 666, 490, 634, 454, 682, 490, 630, 
@@ -52,7 +54,7 @@ const PROGMEM uint16_t PROGMEM rawDataOff[RAW_DATA_LEN]={ // variável constante
   438, 1770, 438, 682, 438, 1770, 438, 682, 
   438, 1770, 414, 706, 438, 1770, 414, 1774, 
   438, 7498, 434, 1000};
-const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={ // variável constante salva na flash
+const PROGMEM uint16_t rawDataOn[198]={ // variável constante salva na flash
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
   466, 1766, 394, 1770, 466, 1726, 434, 1774, 
   466, 1718, 470, 670, 446, 702, 446, 670, 
@@ -78,6 +80,7 @@ const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={ // variável constante salva na
   410, 706, 414, 1794, 414, 706, 414, 1794, 
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
+//uint16_t rawData[RAW_DATA_LEN];
 
 unsigned long tempoDisplay = 0;
 unsigned long sampletime_ms = 3000;//sampe 1s ;
@@ -107,26 +110,29 @@ MQ2 mq2(MQ2PIN);
 EnergyMonitor tensao_entrada_nobreak;
 EnergyMonitor tensao_saida_nobreak;
 //                rs  e   d4  d5   d6   d7
-LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
+//LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 IRsendRaw mySender;
 
 void setup() {  
 //  IPAddress ip(172, 20, 66, 10);
     Serial.begin(9600);
     if (Ethernet.begin(mac) == 0) {
-       Serial.println("DHCP FAILED");
+       Serial.println(F("DHCP FAILED"));
     } else {
-      Serial.println("DHCP DONE");
+      Serial.println(F("DHCP DONE"));
     }
-    lcd.createChar(0, grau);
-    lcd.begin(16,2);
+//    lcd.createChar(0, grau);
+//    lcd.begin(16,2);
+//    lcd.init();
+//    lcd.setBacklight(HIGH);
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
     tensao_entrada_nobreak.voltage(VOLTPIN, VOLT_CAL, 1.7);
     tensao_saida_nobreak.voltage(VOLTPIN, VOLT_CAL, 1.7);
+    Serial.println(F("Ethernet"));
     Serial.println(Ethernet.localIP());
-    Serial.println("Ethernet");
 //    Ethernet.maintain();
 //    for (int i = 50; i > 0; i--) {
 //      lcd.clear();
@@ -167,7 +173,7 @@ void loop() {
     
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
     if (client) {  // Existe um cliente em conexão ?       
-        Serial.println("Send"); 
+        Serial.println(F("Send")); 
         boolean currentLineIsBlank = true;
         while (client.connected()) {          
             if (client.available()) {
@@ -205,6 +211,7 @@ void loop() {
 //                    client.print(tensao_entrada_nobreak.Vrms);
 
                     String request = "";
+                    request.reserve(300);
                     request += "{\"temperatura\": \"";
                     request += dht.readTemperature();
                     request += "\",\"umidade\": \"";
