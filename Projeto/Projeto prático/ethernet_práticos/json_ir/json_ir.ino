@@ -5,7 +5,7 @@
 #include <MQ2.h>
 #include <EmonLib.h>
 //#include <LiquidCrystal.h>
-#include <LiquidCrystal_I2C.h>
+//#include <LiquidCrystal_I2C.h>
 #include <IRLibSendBase.h>
 #include <IRLib_HashRaw.h>
 //#include <EEPROM.h>
@@ -13,9 +13,10 @@
 #define DHTPIN A1 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
 #define MQ2PIN A2
-#define pin2 4
-#define pin1 2
-#define VOLTPIN A3
+#define pin2 4 // Vout2
+#define pin1 2 // Vout1
+#define NOBREAK_ENTRADA_PIN A3
+#define NOBREAK_SAIDA_PIN A4
 #define VOLT_CAL 440.7
 
 //void readIntArrayFromEEPROM(int address, int numbers[], int arraySize){
@@ -28,7 +29,7 @@
 //}
 
 #define RAW_DATA_LEN 350
-const PROGMEM uint16_t PROGMEM rawDataOff[196]={ // variável constante salva na flash
+const PROGMEM uint16_t rawDataOff[196]={ // variável constante salva na flash
   510, 1702, 474, 1730, 494, 1702, 422, 1762, 
   510, 1698, 514, 1694, 494, 1674, 514, 1718, 
   454, 666, 490, 634, 454, 682, 490, 630, 
@@ -81,7 +82,6 @@ const PROGMEM uint16_t rawDataOn[198]={ // variável constante salva na flash
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
 //uint16_t rawData[RAW_DATA_LEN];
-
 unsigned long tempoDisplay = 0;
 unsigned long sampletime_ms = 3000;//sampe 1s ;
 unsigned long duration1;
@@ -92,7 +92,7 @@ float ratio1 = 0;
 float ratio2 = 0;
 float pm2p5 = 0;
 float pm10 = 0;
-byte grau[8] = {
+const PROGMEM byte grau[8] = {
   B11100,
   B10100,
   B11100,
@@ -103,16 +103,16 @@ byte grau[8] = {
   B00000
 };
 
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-EthernetServer server(80);     // Cria um servidor WEB
-DHT dht(DHTPIN, DHTTYPE);
-MQ2 mq2(MQ2PIN);
+const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+const EthernetServer server(80);     // Cria um servidor WEB
+const DHT dht(DHTPIN, DHTTYPE);
+const MQ2 mq2(MQ2PIN);
 EnergyMonitor tensao_entrada_nobreak;
 EnergyMonitor tensao_saida_nobreak;
 //                rs  e   d4  d5   d6   d7
-//LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-IRsendRaw mySender;
+// const PROGMEM LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
+//const LiquidCrystal_I2C lcd(0x27, 16, 2);
+const IRsendRaw mySender;
 
 void setup() {  
 //  IPAddress ip(172, 20, 66, 10);
@@ -129,8 +129,8 @@ void setup() {
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
-    tensao_entrada_nobreak.voltage(VOLTPIN, VOLT_CAL, 1.7);
-    tensao_saida_nobreak.voltage(VOLTPIN, VOLT_CAL, 1.7);
+    tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL, 1.7);
+    tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL, 1.7);
     Serial.println(F("Ethernet"));
     Serial.println(Ethernet.localIP());
 //    Ethernet.maintain();
@@ -148,14 +148,14 @@ void setup() {
 
 void loop() {
     if (millis() > tempoDisplay) {
-      lcd.clear();
-      lcd.print("Temperatura: ");
-      lcd.print(int(dht.readTemperature()));
-      lcd.write(byte(0));
-      lcd.setCursor(0, 1);
-      lcd.print("Umidade:     ");
-      lcd.print(int(dht.readHumidity()));
-      lcd.print("%");
+//      lcd.clear();
+//      lcd.print("Temperatura: ");
+//      lcd.print(int(dht.readTemperature()));
+//      lcd.write(byte(0));
+//      lcd.setCursor(0, 1);
+//      lcd.print("Umidade:     ");
+//      lcd.print(int(dht.readHumidity()));
+//      lcd.print("%");
       tempoDisplay = millis() + 60000;
 
       if (dht.readTemperature() > 26) {
@@ -229,18 +229,18 @@ void loop() {
                     request += pm2p5;
                     request += "\",\"concentracao_pm10\": \"";
                     request += pm10;
-                    request += "\",\"consideracao_ar\": \"";
-                    if (pm2p5 < 1000) {
-                     request += "CLEAN";
-                    } else if (pm2p5 > 1000 && pm2p5 < 10000) {
-                     request += "GOOD";
-                    } else if (pm2p5 > 10000 && pm2p5 < 20000) {      
-                     client.print("ACCEPTABLE");
-                    } else if (pm2p5 > 20000 && pm2p5 < 50000) {
-                     client.print("HEAVY");
-                    } else {   // (pm2p5 > 50000 )
-                     client.print("HAZARD");  
-                    }
+//                    request += "\",\"consideracao_ar\": \"";
+//                    if (pm2p5 < 1000) {
+//                     request += "CLEAN";
+//                    } else if (pm2p5 > 1000 && pm2p5 < 10000) {
+//                     request += "GOOD";
+//                    } else if (pm2p5 > 10000 && pm2p5 < 20000) {      
+//                     client.print("ACCEPTABLE");
+//                    } else if (pm2p5 > 20000 && pm2p5 < 50000) {
+//                     client.print("HEAVY");
+//                    } else {   // (pm2p5 > 50000 )
+//                     client.print("HAZARD");  
+//                    }
                     request += "\"},\"tensao_entrada_nobreak\": \"";
                     request += tensao_entrada_nobreak.Vrms;
                     request += "\",\"tensao_saida_nobreak\": \"";
