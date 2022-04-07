@@ -2,23 +2,23 @@
 //#include <Ethernet.h>
 //#include <DHT.h>
 //#include <MQ2.h>
-#include <EmonLib.h>
+//#include <EmonLib.h>
 //#include <IRLibSendBase.h>
 //#include <IRLib_HashRaw.h>
 //#include <LiquidCrystal.h>
-//#include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal_I2C.h>
 
 //#define DHTPIN A1 // pino que estamos conectado
 //#define DHTTYPE DHT11 // DHT  
 //#define MQ2PIN A2
 //#define pin2 4 // Vout2
 //#define pin1 2 // Vout1
-#define NOBREAK_ENTRADA_PIN A3
-#define NOBREAK_SAIDA/_PIN A4
-#define VOLT_CAL 440.7
+//#define NOBREAK_ENTRADA_PIN A3
+//#define NOBREAK_SAIDA_PIN A4
+//#define VOLT_CAL 440.7
 
 //#define RAW_DATA_LEN 350
-//const PROGMEM uint16_t rawDataOff[196]={ // variável constante salva na flash
+//const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={ // variável constante salva na flash
 //  510, 1702, 474, 1730, 494, 1702, 422, 1762, 
 //  510, 1698, 514, 1694, 494, 1674, 514, 1718, 
 //  454, 666, 490, 634, 454, 682, 490, 630, 
@@ -44,7 +44,7 @@
 //  438, 1770, 438, 682, 438, 1770, 438, 682, 
 //  438, 1770, 414, 706, 438, 1770, 414, 1774, 
 //  438, 7498, 434, 1000};
-//const PROGMEM uint16_t rawDataOn[198]={ // variável constante salva na flash
+//const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={ // variável constante salva na flash
 //  5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
 //  466, 1766, 394, 1770, 466, 1726, 434, 1774, 
 //  466, 1718, 470, 670, 446, 702, 446, 670, 
@@ -70,7 +70,7 @@
 //  410, 706, 414, 1794, 414, 706, 414, 1794, 
 //  414, 706, 414, 1770, 438, 706, 414, 1770, 
 //  414, 1794, 414, 7550, 414, 1000};
-//
+
 unsigned long tempoDisplay = 0;
 //unsigned long sampletime_ms = 3000;//sampe 1s
 //unsigned long duration1;
@@ -81,77 +81,75 @@ unsigned long tempoDisplay = 0;
 //float ratio2 = 0;
 //float pm2p5 = 0;
 //float pm10 = 0;
-//const PROGMEM byte grau[8] = {
-//  B11100,
-//  B10100,
-//  B11100,
-//  B00000,
-//  B00000,
-//  B00000,
-//  B00000,
-//  B00000
-//};
+const PROGMEM byte grau[8] = {
+  B11100,
+  B10100,
+  B11100,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000
+};
 //
 //const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 //const EthernetServer server(80);     // Cria um servidor WEB
 //const DHT dht(DHTPIN, DHTTYPE);
 //const MQ2 mq2(MQ2PIN);
-EnergyMonitor tensao_entrada_nobreak;
-EnergyMonitor tensao_saida_nobreak;
-//                rs  e   d4  d5   d6   d7
-// const PROGMEM LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
-//const LiquidCrystal_I2C lcd(0x27, 16, 2);
+//EnergyMonitor tensao_entrada_nobreak;
+//EnergyMonitor tensao_saida_nobreak;
+//                               rs  e   d4  d5   d6   d7
+//const LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
+const LiquidCrystal_I2C lcd(0x27, 16, 2);
 //const IRsendRaw mySender;
 
 void setup() {
 //    Serial.begin(9600);
 //    Ethernet.begin(mac);
-//    lcd.createChar(0, grau);
+    lcd.createChar(0, grau);
 //    lcd.begin(16,2);
-//    lcd.init();
-//    lcd.setBacklight(HIGH);
+    lcd.init();
+    lcd.setBacklight(HIGH);
 //    server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
 //    dht.begin();
 //    mq2.begin();
-    tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL, 1.7);
-    tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL, 1.7);
+//    tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL, 1.7);
+//    tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL, 1.7);
 
-//    for (int i = 50; i > 0; i--) {
-//      lcd.clear();
-//      lcd.print("IP local:");
-//      lcd.setCursor(0,1);
-//      lcd.print(Ethernet.localIP());
-//      lcd.setCursor(13,0);
-//      lcd.print(i);
-//      lcd.print("s");
-//      delay(1000);
-//    }
+    for (int i = 50; i > 0; i--) {
+      lcd.clear();
+      lcd.print("IP local:");
+      lcd.setCursor(0,1);
+      lcd.print("172.60.22.10");
+      lcd.setCursor(13,0);
+      lcd.print(i);
+      lcd.print("s");
+      delay(1000);
+    }
 } // fim do setup
 
 void loop() {
-//    if (millis() > tempoDisplay) {
-////      lcd.clear();
-////      lcd.print("Temperatura: ");
-////      lcd.print(int(dht.readTemperature()));
-////      lcd.write(byte(0));
-////      lcd.setCursor(0, 1);
-////      lcd.print("Umidade:     ");
-////      lcd.print(int(dht.readHumidity()));
-////      lcd.print("%");
-//      tempoDisplay = millis() + 60000;
-//
-//      if (dht.readTemperature() > 26) {
-////        uint16_t rawDataOn[198];
-////        readIntArrayFromEEPROM(0, rawDataOn, 198);
-////        mySender.send(rawDataOn,RAW_DATA_LEN,36);/
+    if (millis() > tempoDisplay) {
+      lcd.clear();
+      lcd.print("Temperatura: ");
+      lcd.print("20");
+      lcd.write(byte(0));
+      lcd.setCursor(0, 1);
+      lcd.print("Umidade:     ");
+      lcd.print("80");
+      lcd.print("%");
+      tempoDisplay = millis() + 60000;
+
+//      if (dht.readTemperature() > 26) {/
+//        mySender.send(rawDataOn,RAW_DATA_LEN,36);
 //      }
 ////
 //      if (dht.readTemperature() <= 21) {
-////        mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//        mySender.send(rawDataOff,RAW_DATA_LEN,36);
 //      }
-//
-////      Ethernet.maintain();
-//    }
+
+//      Ethernet.maintain();
+    }
     
 //    EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
 //    if (client) {  // Existe um cliente em conexão ?        
@@ -182,8 +180,8 @@ void loop() {
 //                    tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
 //                    tensao_saida_nobreak.calcVI(17,2000);
 
-                    String request = "";
-                    request.reserve(300);
+//                    String request = "";
+//                    request.reserve(300);
 //                    request += "{\"temperatura\": \"";
 //                    request += dht.readTemperature();
 //                    request += "\",\"umidade\": \"";
@@ -211,9 +209,9 @@ void loop() {
 ////                     client.print("HAZARD");  
 ////                    }
 //                    request += "\"},\"tensao_entrada_nobreak\": \"";
-                    request += tensao_entrada_nobreak.Vrms;
+//                    request += tensao_entrada_nobreak.Vrms;
 //                    request += "\",\"tensao_saida_nobreak\": \"";
-                    request += tensao_saida_nobreak.Vrms;
+//                    request += tensao_saida_nobreak.Vrms;
 //                    request += "\"}";
 //                    client.print(request);
 
