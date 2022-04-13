@@ -30,7 +30,7 @@
 //}
 
 #define RAW_DATA_LEN 350
-const PROGMEM uint16_t rawDataOff[196]={ // variável constante salva na flash
+const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={ // variável constante salva na flash 196
   510, 1702, 474, 1730, 494, 1702, 422, 1762, 
   510, 1698, 514, 1694, 494, 1674, 514, 1718, 
   454, 666, 490, 634, 454, 682, 490, 630, 
@@ -56,7 +56,7 @@ const PROGMEM uint16_t rawDataOff[196]={ // variável constante salva na flash
   438, 1770, 438, 682, 438, 1770, 438, 682, 
   438, 1770, 414, 706, 438, 1770, 414, 1774, 
   438, 7498, 434, 1000};
-const PROGMEM uint16_t rawDataOn[198]={ // variável constante salva na flash
+const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={ // variável constante salva na flash 198
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
   466, 1766, 394, 1770, 466, 1726, 434, 1774, 
   466, 1718, 470, 670, 446, 702, 446, 670, 
@@ -82,7 +82,7 @@ const PROGMEM uint16_t rawDataOn[198]={ // variável constante salva na flash
   410, 706, 414, 1794, 414, 706, 414, 1794, 
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
-//uint16_t rawData[RAW_DATA_LEN];
+
 unsigned long tempoDisplay = 0;
 #define sampletime_ms 3000 //sampe 1s ;
 unsigned long duration1;
@@ -113,10 +113,10 @@ EnergyMonitor tensao_saida_nobreak;
 //                rs  e   d4  d5   d6   d7
 // const PROGMEM LiquidCrystal lcd(5,  8,  9,  A4,  A5,  4);
 //const LiquidCrystal_I2C lcd(0x27, 16, 2);
-const IRsendRaw mySender;
+IRsendRaw mySender;
+bool ar_condicionado = false;
 
-void setup() {  
-//  IPAddress ip(172, 20, 66, 10);
+void setup() {
     pinMode(MQ2PIN_DIGITAL, INPUT);
     Serial.begin(9600);
     if (Ethernet.begin(mac) == 0) {
@@ -145,6 +145,7 @@ void setup() {
 //      lcd.print("s");
 //      delay(1000);
 //    }
+    mySender.send(rawDataOff,RAW_DATA_LEN,36);
 } // fim do setup
 
 void loop() {
@@ -160,13 +161,13 @@ void loop() {
       tempoDisplay = millis() + 60000;
 
       if (dht.readTemperature() > 26) {
-//        uint16_t rawDataOn[198];
-//        readIntArrayFromEEPROM(0, rawDataOn, 198);
         mySender.send(rawDataOn,RAW_DATA_LEN,36);
+        ar_condicionado = true;
       }
 
-      if (dht.readTemperature() <= 21) {
+      if (dht.readTemperature() <= 23) {
         mySender.send(rawDataOff,RAW_DATA_LEN,36);
+        ar_condicionado = false;
       }
 
       Ethernet.maintain();
@@ -201,15 +202,6 @@ void loop() {
 
                     tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
                     tensao_saida_nobreak.calcVI(17,2000);
-  
-//                    client.print(dht.readTemperature());
-//                    client.print(dht.readHumidity());
-//                    client.print(mq2.readLPG());
-//                    client.print(mq2.readCO());
-//                    client.print(mq2.readSmoke());
-//                    client.print(pm2p5);
-//                    client.print(pm10);
-//                    client.print(tensao_entrada_nobreak.Vrms);
 
                     String request = "";
                     request.reserve(300);
@@ -246,6 +238,9 @@ void loop() {
                     request += tensao_entrada_nobreak.Vrms;
                     request += "\",\"tensao_saida_nobreak\": \"";
                     request += tensao_saida_nobreak.Vrms;
+                    request += "\",\"ar_condicionado\": \"";
+                    if (ar_condicionado) request += "1";
+                    else request += "0";
                     request += "\"}";
                     client.print(request);
 
