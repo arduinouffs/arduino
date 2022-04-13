@@ -28,6 +28,7 @@ float ratio1 = 0;
 float ratio2 = 0;
 float concentration1 = 0;
 float concentration2 = 0;
+int count = 1;
 
 MQ7 mq7(MQ7_PIN, VOLTAGE);
 MQUnifiedsensor MQ9(Board, Voltage_Resolution, ADC_Bit_Resolution, MQ9_PIN, Type);
@@ -166,5 +167,7 @@ void loop() {
   Serial.print(dht.readTemperature()); Serial.print(","); Serial.print(dht.readHumidity());
   
   Serial.println();
-  delay(30000);
+  Serial.print("Contagem "); Serial.println(count);
+  count++;
+//  delay(30000);
 }

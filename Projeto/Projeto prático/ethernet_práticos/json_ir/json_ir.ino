@@ -10,14 +10,15 @@
 #include <IRLib_HashRaw.h>
 //#include <EEPROM.h>
 
-#define DHTPIN A1 // pino que estamos conectado
+#define DHTPIN A0 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT  
-#define MQ2PIN A2
-#define pin2 4 // Vout2
-#define pin1 2 // Vout1
+#define MQ2PIN A1
+#define MQ2PIN_DIGITAL A5
+#define pin2 A4 // Vout2 PM10
+#define pin1 2 // Vout1 PM2.5
 #define NOBREAK_ENTRADA_PIN A3
-#define NOBREAK_SAIDA_PIN A4
-#define VOLT_CAL 440.7
+#define NOBREAK_SAIDA_PIN A2
+#define VOLT_CAL 458
 
 //void readIntArrayFromEEPROM(int address, int numbers[], int arraySize){
 //  int addressIndex = address;
@@ -83,7 +84,7 @@ const PROGMEM uint16_t rawDataOn[198]={ // variável constante salva na flash
   414, 1794, 414, 7550, 414, 1000};
 //uint16_t rawData[RAW_DATA_LEN];
 unsigned long tempoDisplay = 0;
-unsigned long sampletime_ms = 3000;//sampe 1s ;
+#define sampletime_ms 3000 //sampe 1s ;
 unsigned long duration1;
 unsigned long duration2;
 unsigned long lowpulseoccupancy1 = 0;
@@ -92,16 +93,16 @@ float ratio1 = 0;
 float ratio2 = 0;
 float pm2p5 = 0;
 float pm10 = 0;
-const PROGMEM byte grau[8] = {
-  B11100,
-  B10100,
-  B11100,
-  B00000,
-  B00000,
-  B00000,
-  B00000,
-  B00000
-};
+//const PROGMEM byte grau[8] = {
+//  B11100,
+//  B10100,
+//  B11100,
+//  B00000,
+//  B00000,
+//  B00000,
+//  B00000,
+//  B00000
+//};
 
 const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 const EthernetServer server(80);     // Cria um servidor WEB
@@ -116,6 +117,7 @@ const IRsendRaw mySender;
 
 void setup() {  
 //  IPAddress ip(172, 20, 66, 10);
+    pinMode(MQ2PIN_DIGITAL, INPUT);
     Serial.begin(9600);
     if (Ethernet.begin(mac) == 0) {
        Serial.println(F("DHCP FAILED"));
@@ -131,7 +133,6 @@ void setup() {
     mq2.begin();
     tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL, 1.7);
     tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL, 1.7);
-    Serial.println(F("Ethernet"));
     Serial.println(Ethernet.localIP());
 //    Ethernet.maintain();
 //    for (int i = 50; i > 0; i--) {
@@ -218,13 +219,13 @@ void loop() {
                     request += dht.readHumidity();
                     request += "\",\"gas_inflamavel\": \"";
                     request += mq2.readLPG();
-//                    request += "nan";
                     request += "\",\"CO2\": \"";
                     request += mq2.readCO();
-//                    request += "nan";
                     request += "\",\"fumaca\": \"";
                     request += mq2.readSmoke();
-//                    request += "nan";
+                    request += "\",\"presenca_fumaca\": \"";
+                    if (!digitalRead(MQ2PIN_DIGITAL)) request += "1";
+                    else request += "0";
                     request += "\",\"ar\": {\"concentracao_pm2p5\": \"";
                     request += pm2p5;
                     request += "\",\"concentracao_pm10\": \"";

@@ -1,6 +1,6 @@
 #include "EmonLib.h" //INCLUSÃO DE BIBLIOTECA
 
-#define VOLT_CAL 440.7 //VALOR DE CALIBRAÇÃO (DEVE SER AJUSTADO EM PARALELO COM UM MULTÍMETRO)
+#define VOLT_CAL 458 //VALOR DE CALIBRAÇÃO (DEVE SER AJUSTADO EM PARALELO COM UM MULTÍMETRO)
 #define ZMPT101BPIN A3
 EnergyMonitor emon1; //CRIA UMA INSTÂNCIA
 
@@ -12,13 +12,15 @@ void setup(){
 
 void loop(){
   emon1.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
-  emon1.serialprint();           // Print out all variables (realpower, apparent power, Vrms, Irms, power factor)
+//  emon1.serialprint();           // Print out all variables (realpower, apparent power, Vrms, Irms, power factor)
   
-  float realPower       = emon1.realPower;        //extract Real Power into variable
-  float apparentPower   = emon1.apparentPower;    //extract Apparent Power into variable
-  float powerFActor     = emon1.powerFactor;      //extract Power Factor into Variable
-  float supplyVoltage   = emon1.Vrms;             //extract Vrms into Variable (Voltagem)
-  float Irms            = emon1.Irms;             //extract Irms into VariableSERIAL (Corente)
+//  float realPower       = emon1.realPower;        //extract Real Power into variable
+//  float apparentPower   = emon1.apparentPower;    //extract Apparent Power into variable
+//  float powerFActor     = emon1.powerFactor;      //extract Power Factor into Variable
+//  float supplyVoltage   = emon1.Vrms;             //extract Vrms into Variable (Voltagem)
+//  float Irms            = emon1.Irms;             //extract Irms into VariableSERIAL (Corente)
+
+  Serial.println(emon1.Vrms);
   
   delay(1000);
 }
