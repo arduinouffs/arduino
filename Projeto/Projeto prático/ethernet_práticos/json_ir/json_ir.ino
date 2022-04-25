@@ -18,7 +18,8 @@
 #define pin1 2 // Vout1 PM2.5
 #define NOBREAK_ENTRADA_PIN A3
 #define NOBREAK_SAIDA_PIN A2
-#define VOLT_CAL 458
+#define VOLT_CAL_ENTRADA 458
+#define VOLT_CAL_SAIDA 469
 
 //void readIntArrayFromEEPROM(int address, int numbers[], int arraySize){
 //  int addressIndex = address;
@@ -116,11 +117,15 @@ EnergyMonitor tensao_saida_nobreak;
 IRsendRaw mySender;
 bool ar_condicionado = false;
 
+void (*Reset)() = 0;
+
 void setup() {
     pinMode(MQ2PIN_DIGITAL, INPUT);
     Serial.begin(9600);
     if (Ethernet.begin(mac) == 0) {
        Serial.println(F("DHCP FAILED"));
+       delay(30000);
+       Reset();
     } else {
       Serial.println(F("DHCP DONE"));
     }
@@ -131,8 +136,8 @@ void setup() {
     server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
-    tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL, 1.7);
-    tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL, 1.7);
+    tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
+    tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
     Serial.println(Ethernet.localIP());
 //    Ethernet.maintain();
 //    for (int i = 50; i > 0; i--) {
