@@ -1,5 +1,5 @@
-//#include <SPI.h>
-//#include <Ethernet.h>
+#include <SPI.h>
+#include <Ethernet.h>
 #include <DHT.h>
 #include <MQ2.h>
 #include <EmonLib.h>
@@ -29,8 +29,8 @@ float pm2p5 = 0;
 float pm10 = 0;
 bool ar_condicionado = false;
 
-//const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x01 };
-//const EthernetServer server(80);     // Cria um servidor WEB
+const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x01 };
+const EthernetServer server(80);     // Cria um servidor WEB
 const DHT dht(DHTPIN, DHTTYPE);
 const MQ2 mq2(MQ2PIN);
 EnergyMonitor tensao_entrada_nobreak;
@@ -42,19 +42,19 @@ void (*Reset)() = 0;
 void setup() {
     pinMode(MQ2PIN_DIGITAL, INPUT);
     Serial.begin(9600);
-//    if (Ethernet.begin(mac) == 0) {
-//       Serial.println(F("DHCP FAILED"));
-//       delay(30000);
-//       Reset();
-//    } else {
-//      Serial.println(F("DHCP DONE"));
-//    }
-//    server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
+    if (Ethernet.begin(mac) == 0) {
+       Serial.println(F("DHCP FAILED"));
+       delay(30000);
+       Reset();
+    } else {
+      Serial.println(F("DHCP DONE"));
+    }
+    server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
     dht.begin();
     mq2.begin();
     tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
     tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
-//    Serial.println(Ethernet.localIP());
+    Serial.println(Ethernet.localIP());
 //    mySender.send(rawDataOff,RAW_DATA_LEN,36);
 } // fim do setup
 
@@ -132,88 +132,104 @@ void loop() {
         Serial.println(F("Ar desligado"));
       }
 
-//      Ethernet.maintain();
+      switch (Ethernet.maintain()) {
+        case 0:
+          Serial.println("0: nothing happened");
+        break;
+        case 1:
+          Serial.println("1: renew failed");
+        break;
+        case 2:
+          Serial.println("2: renew success");
+        break;
+        case 3:
+          Serial.println("3: rebind fail");
+        break;
+        case 4:
+          Serial.println("4: rebind success");
+        break;
+      }
     }
     
-//    EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
-//    if (client) {  // Existe um cliente em conexão ?       
-//        Serial.println(F("Send")); 
-//        boolean currentLineIsBlank = true;
-//        while (client.connected()) {          
-//            if (client.available()) {
-//                char c = client.read(); // lê 1 byte (character) do cliente
-//                                
-//                if (c == '\n' && currentLineIsBlank) {  
-//                    // ENVIA A PÁGINA WEB
-//                    client.println("HTTP/1.1 200 OK");
-//                    client.println("Content-Type: aplication/json");
-//                    client.println("Content-Disposition: attachment ; filename = \"data.json\"");
-//                    client.println("Connection: close");
-//                    client.println();
-//
-//                    duration1 = pulseIn(pin1, LOW);
-//                    duration2 = pulseIn(pin2, LOW);
-//                    lowpulseoccupancy1 = lowpulseoccupancy1+duration1;
-//                    lowpulseoccupancy2 = lowpulseoccupancy2+duration2;
-//
-//                    ratio1 = lowpulseoccupancy1/(sampletime_ms*10.0);  // Integer percentage 0=>100
-//                    pm2p5 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; // using spec sheet curve
-//                  
-//                    ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
-//                    pm10 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
-//
-//                    tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
-//                    tensao_saida_nobreak.calcVI(17,2000);
-//
-//                    String request = "";
-//                    request.reserve(300);
-//                    request += "{\"temperatura\": \"";
-//                    request += dht.readTemperature();
-//                    request += "\",\"umidade\": \"";
-//                    request += dht.readHumidity();
-//                    request += "\",\"gas_inflamavel\": \"";
-//                    request += mq2.readLPG();
-//                    request += "\",\"CO2\": \"";
-//                    request += mq2.readCO();
-//                    request += "\",\"fumaca\": \"";
-//                    request += mq2.readSmoke();
-//                    request += "\",\"presenca_fumaca\": \"";
-//                    if (!digitalRead(MQ2PIN_DIGITAL)) request += "1";
-//                    else request += "0";
-//                    request += "\",\"ar\": {\"concentracao_pm2p5\": \"";
-//                    request += pm2p5;
-//                    request += "\",\"concentracao_pm10\": \"";
-//                    request += pm10;
-//                    request += "\"},\"tensao_entrada_nobreak\": \"";
-//                    request += tensao_entrada_nobreak.Vrms;
-//                    request += "\",\"tensao_saida_nobreak\": \"";
-//                    request += tensao_saida_nobreak.Vrms;
-//                    request += "\",\"ar_condicionado\": \"";
-//                    if (ar_condicionado) request += "1";
-//                    else request += "0";
-//                    request += "\"}";
-//                    client.print(request);
-//
-//                    lowpulseoccupancy1 = 0;
-//                    lowpulseoccupancy2 = 0;
-//
-//                    break;                
-//                }
-//                
-//                // toda linha de texto recebida do cliente termina com os caracteres \r\n
-//                if (c == '\n') {
-//                    // ultimo caractere da linha do texto recebido
-//                    // iniciando nova linha com o novo caractere lido
-//                    currentLineIsBlank = true;
-//                } 
-//                else if (c != '\r') {
-//                    // um caractere de texto foi recebido do cliente
-//                    currentLineIsBlank = false;
-//                }
-//            } // fim do if (client.available())
-//        } // fim do while (client.connected())
-//        
-//        delay(1);      // da um tempo para o WEB Browser receber o texto
-//        client.stop(); // termina a conexão
-//    } // fim do if (client)
+    EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
+    if (client) {  // Existe um cliente em conexão ?       
+        Serial.println(F("Send")); 
+        boolean currentLineIsBlank = true;
+        while (client.connected()) {          
+            if (client.available()) {
+                char c = client.read(); // lê 1 byte (character) do cliente
+                                
+                if (c == '\n' && currentLineIsBlank) {  
+                    // ENVIA A PÁGINA WEB
+                    client.println("HTTP/1.1 200 OK");
+                    client.println("Content-Type: aplication/json");
+                    client.println("Content-Disposition: attachment ; filename = \"data.json\"");
+                    client.println("Connection: close");
+                    client.println();
+
+                    duration1 = pulseIn(pin1, LOW);
+                    duration2 = pulseIn(pin2, LOW);
+                    lowpulseoccupancy1 = lowpulseoccupancy1+duration1;
+                    lowpulseoccupancy2 = lowpulseoccupancy2+duration2;
+
+                    ratio1 = lowpulseoccupancy1/(sampletime_ms*10.0);  // Integer percentage 0=>100
+                    pm2p5 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; // using spec sheet curve
+                  
+                    ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
+                    pm10 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
+
+                    tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
+                    tensao_saida_nobreak.calcVI(17,2000);
+
+                    String request = "";
+                    request.reserve(300);
+                    request += "{\"temperatura\": \"";
+                    request += dht.readTemperature();
+                    request += "\",\"umidade\": \"";
+                    request += dht.readHumidity();
+                    request += "\",\"gas_inflamavel\": \"";
+                    request += mq2.readLPG();
+                    request += "\",\"CO2\": \"";
+                    request += mq2.readCO();
+                    request += "\",\"fumaca\": \"";
+                    request += mq2.readSmoke();
+                    request += "\",\"presenca_fumaca\": \"";
+                    if (!digitalRead(MQ2PIN_DIGITAL)) request += "1";
+                    else request += "0";
+                    request += "\",\"ar\": {\"concentracao_pm2p5\": \"";
+                    request += pm2p5;
+                    request += "\",\"concentracao_pm10\": \"";
+                    request += pm10;
+                    request += "\"},\"tensao_entrada_nobreak\": \"";
+                    request += tensao_entrada_nobreak.Vrms;
+                    request += "\",\"tensao_saida_nobreak\": \"";
+                    request += tensao_saida_nobreak.Vrms;
+                    request += "\",\"ar_condicionado\": \"";
+                    if (ar_condicionado) request += "1";
+                    else request += "0";
+                    request += "\"}";
+                    client.print(request);
+
+                    lowpulseoccupancy1 = 0;
+                    lowpulseoccupancy2 = 0;
+
+                    break;                
+                }
+                
+                // toda linha de texto recebida do cliente termina com os caracteres \r\n
+                if (c == '\n') {
+                    // ultimo caractere da linha do texto recebido
+                    // iniciando nova linha com o novo caractere lido
+                    currentLineIsBlank = true;
+                } 
+                else if (c != '\r') {
+                    // um caractere de texto foi recebido do cliente
+                    currentLineIsBlank = false;
+                }
+            } // fim do if (client.available())
+        } // fim do while (client.connected())
+        
+        delay(1);      // da um tempo para o WEB Browser receber o texto
+        client.stop(); // termina a conexão
+    } // fim do if (client)
 } // fim do loop
