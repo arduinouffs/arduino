@@ -59,7 +59,7 @@ void setup() {
 } // fim do setup
 
 #define RAW_DATA_LEN 350
-const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={
+uint16_t rawDataOff[RAW_DATA_LEN]={
   5994, 7398, 506, 1662, 478, 1710, 498, 1690, 
   458, 1706, 506, 1686, 538, 1630, 462, 1722, 
   546, 1626, 546, 610, 518, 586, 498, 638, 
@@ -87,7 +87,7 @@ const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={
   446, 1734, 486, 7422, 482, 1000};
 
 #define RAW_DATA_LEN 350
-const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={
+uint16_t rawDataOn[RAW_DATA_LEN]={
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
   466, 1766, 394, 1770, 466, 1726, 434, 1774, 
   466, 1718, 470, 670, 446, 702, 446, 670, 

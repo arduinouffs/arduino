@@ -75,7 +75,7 @@ uint16_t rawDataOn[RAW_DATA_LEN]={
    
 void loop() {
   mySender.send(rawDataOff,RAW_DATA_LEN,36);
-  delay(10000);
-  mySender.send(rawDataOn,RAW_DATA_LEN,36);
-  delay(10000);
+  delay(1000);
+//  mySender.send(rawDataOn,RAW_DATA_LEN,36);
+//  delay(10000);
 }
