@@ -4,21 +4,24 @@
 //#include <MQ2.h>
 #include <EmonLib.h>
 #include <IRLibSendBase.h>    //We need the base code/
-#include <IRLib_HashRaw.h>    //Only use raw
+#include <IRLib_HashRaw.h>    //Only use raw sender
+
 IRsendRaw mySender;
 
 #define DHTPIN A0 // pino que estamos conectado
-#define DHTTYPE DHT11 // DHT  
+#define DHTTYPE DHT11 // DHT
 #define MQ2PIN A1
 #define MQ2PIN_DIGITAL A5
-#define pin2 A4 // Vout2 PM10
-#define pin1 2 // Vout1 PM2.5
 #define NOBREAK_ENTRADA_PIN A3
 #define NOBREAK_SAIDA_PIN A2
 #define VOLT_CAL_ENTRADA 458
 #define VOLT_CAL_SAIDA 469
+#define pin2 A4 // Vout2 PM10
+#define pin1 2 // Vout1 PM2.
 
+bool ar_condicionado = false;
 unsigned long tempoDisplay = 0;
+
 #define sampletime_ms 3000 //sampe 1s ;
 unsigned long duration1;
 unsigned long duration2;
@@ -28,7 +31,6 @@ float ratio1 = 0;
 float ratio2 = 0;
 float pm2p5 = 0;
 float pm10 = 0;
-bool ar_condicionado = false;
 
 const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x04 };
 const EthernetServer server(80);     // Cria um servidor WEB
@@ -38,25 +40,6 @@ EnergyMonitor tensao_entrada_nobreak;
 EnergyMonitor tensao_saida_nobreak;
 
 void (*Reset)() = 0;
-
-void setup() {
-    pinMode(MQ2PIN_DIGITAL, INPUT);
-    Serial.begin(9600);
-    if (Ethernet.begin(mac) == 0) {
-       Serial.println(F("DHCP FAILED"));
-       delay(30000);
-       Reset();
-    } else {
-      Serial.println(F("DHCP DONE"));
-    }
-    server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
-    dht.begin();
-//    mq2.begin();
-    tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
-    tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
-    Serial.println(Ethernet.localIP());
-//    mySender.send(rawDataOff,RAW_DATA_LEN,36);
-} // fim do setup
 
 #define RAW_DATA_LEN 350
 uint16_t rawDataOff[RAW_DATA_LEN]={
@@ -114,41 +97,67 @@ uint16_t rawDataOn[RAW_DATA_LEN]={
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
 
+void setup() {
+  pinMode(MQ2PIN_DIGITAL, INPUT);
+  Serial.begin(9600);
+  Serial.println("Ligado");
+  for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+  if (Ethernet.begin(mac) == 0) {
+     Serial.println(F("DHCP FAILED"));
+     delay(30000);
+     Reset();
+  } else {
+    Serial.println(F("DHCP DONE"));
+  }
+  server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
+  dht.begin();
+//  mq2.begin();
+  tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
+  tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
+  Serial.println(Ethernet.localIP());
+}
+
 void loop() {
-    if (millis() > tempoDisplay) {
-      tempoDisplay = millis() + 60000;
+  if (millis() > tempoDisplay) {
+      tempoDisplay = millis() + 5000;
 
       Serial.print(F("Temeperatura: ")); Serial.println(dht.readTemperature());
 
-      if (dht.readTemperature() > 26) {
+      if (dht.readTemperature() > 26/* && ar_condicionado == false*/) {
         for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
         ar_condicionado = true;
         Serial.println(F("Ar ligado"));
       }
 
-      if (dht.readTemperature() <= 23) {
+      if (dht.readTemperature() > 28){
+        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+        ar_condicionado = true;
+        Serial.println(F("Forçando Ar ligado"));
+      }
+
+      if (dht.readTemperature() <= 23/* && ar_condicionado*/) {
         for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
         ar_condicionado = false;
         Serial.println(F("Ar desligado"));
       }
 
-      switch (Ethernet.maintain()) {
-        case 0:
-          Serial.println("0: nothing happened");
-        break;
-        case 1:
-          Serial.println("1: renew failed");
-        break;
-        case 2:
-          Serial.println("2: renew success");
-        break;
-        case 3:
-          Serial.println("3: rebind fail");
-        break;
-        case 4:
-          Serial.println("4: rebind success");
-        break;
-      }
+//      switch (Ethernet.maintain()) {
+//        case 0:
+//          Serial.println("0: nothing happened");
+//        break;
+//        case 1:
+//          Serial.println("1: renew failed");
+//        break;
+//        case 2:
+//          Serial.println("2: renew success");
+//        break;
+//        case 3:
+//          Serial.println("3: rebind fail");
+//        break;
+//        case 4:
+//          Serial.println("4: rebind success");
+//        break;
+//      }
     }
     
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
@@ -182,7 +191,6 @@ void loop() {
                     tensao_saida_nobreak.calcVI(17,2000);
 
                     String request = "";
-                    request.reserve(300);
                     request += "{\"temperatura\": \"";
                     request += dht.readTemperature();
                     request += "\",\"umidade\": \"";
@@ -209,9 +217,6 @@ void loop() {
                     else request += "0";
                     request += "\"}";
                     client.print(request);
-
-                    lowpulseoccupancy1 = 0;
-                    lowpulseoccupancy2 = 0;
 
                     break;                
                 }
