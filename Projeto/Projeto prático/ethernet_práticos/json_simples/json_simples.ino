@@ -21,6 +21,7 @@ IRsendRaw mySender;
 
 bool ar_condicionado = false;
 unsigned long tempoDisplay = 0;
+bool dehumidify = false;
 
 #define sampletime_ms 3000 //sampe 1s ;
 unsigned long duration1;
@@ -97,10 +98,15 @@ uint16_t rawDataOn[RAW_DATA_LEN]={
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
 
+#define RAW_DATA_LEN 350
+uint16_t rawDataDehumidify[RAW_DATA_LEN]={
+  
+}
+
 void setup() {
   pinMode(MQ2PIN_DIGITAL, INPUT);
   Serial.begin(9600);
-  Serial.println("Ligado");
+  Serial.println(F("Ligado"));
   for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
   if (Ethernet.begin(mac) == 0) {
      Serial.println(F("DHCP FAILED"));
@@ -120,46 +126,58 @@ void setup() {
 void loop() {
   if (millis() > tempoDisplay) {
       tempoDisplay = millis() + 60000;
-
-      Serial.print(F("Temeperatura: ")); Serial.println(dht.readTemperature());
-
-      if (dht.readTemperature() > 26 && ar_condicionado == false) {
-        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
-        ar_condicionado = true;
-        Serial.println(F("Ar ligado"));
-      }
-
-      if (dht.readTemperature() > 28){
-        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
-        ar_condicionado = true;
-        Serial.println(F("Forçando Ar ligado"));
-      }
-
-      if (dht.readTemperature() <= 23 && ar_condicionado) {
-        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-        ar_condicionado = false;
-        Serial.println(F("Ar desligado"));
-      }
-
-//      switch (Ethernet.maintain()) {
-//        case 0:
-//          Serial.println("0: nothing happened");
-//        break;
-//        case 1:
-//          Serial.println("1: renew failed");
-//        break;
-//        case 2:
-//          Serial.println("2: renew success");
-//        break;
-//        case 3:
-//          Serial.println("3: rebind fail");
-//        break;
-//        case 4:
-//          Serial.println("4: rebind success");
-//        break;
-//      }
+      float temperatura = dht.readTemperature();
+      float umidade = dht.readHumidity();
+      Serial.print(F("Temperatura: ")); Serial.println(temperatura);
+      
+      if (umidade < 60) {
+        dehumity = false;
+        
+        if (temperatura > 26 && ar_condicionado == false) {
+          for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+          ar_condicionado = true;
+          Serial.println(F("Ar ligado"));
+        }
+  
+        if (temperatura > 28){
+          for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+          ar_condicionado = true;
+          Serial.println(F("Forçando Ar ligado"));
+        }
+  
+        if (temperatura <= 23 && ar_condicionado) {
+          for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+          ar_condicionado = false;
+          Serial.println(F("Ar desligado"));
+        }
+      } else {
+          if (dehumity == false) {
+            for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
+            Serial.println(F("Desumidificação em ação"));
+            dehumity = true;
+          }
+      }      
     }
-    
+
+//    switch (Ethernet.maintain()) {
+//      case 0:
+//        Serial.println("0: nothing happened");
+//      break;
+//      case 1:
+//        Serial.println("1: renew failed");
+//      break;
+//      case 2:
+//        Serial.println("2: renew success");
+//      break;
+//      case 3:
+//        Serial.println("3: rebind fail");
+//      break;
+//      case 4:
+//        Serial.println("4: rebind success");
+//      break;
+//    }
+
+    Ethernet.maintain();
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
     if (client) {  // Existe um cliente em conexão ?       
         Serial.println(F("Send")); 
