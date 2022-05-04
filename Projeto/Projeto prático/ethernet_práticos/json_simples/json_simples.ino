@@ -119,11 +119,11 @@ void setup() {
 
 void loop() {
   if (millis() > tempoDisplay) {
-      tempoDisplay = millis() + 5000;
+      tempoDisplay = millis() + 60000;
 
       Serial.print(F("Temeperatura: ")); Serial.println(dht.readTemperature());
 
-      if (dht.readTemperature() > 26/* && ar_condicionado == false*/) {
+      if (dht.readTemperature() > 26 && ar_condicionado == false) {
         for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
         ar_condicionado = true;
         Serial.println(F("Ar ligado"));
@@ -135,7 +135,7 @@ void loop() {
         Serial.println(F("Forçando Ar ligado"));
       }
 
-      if (dht.readTemperature() <= 23/* && ar_condicionado*/) {
+      if (dht.readTemperature() <= 23 && ar_condicionado) {
         for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
         ar_condicionado = false;
         Serial.println(F("Ar desligado"));
