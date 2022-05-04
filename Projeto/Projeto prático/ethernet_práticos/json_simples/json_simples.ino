@@ -42,7 +42,7 @@ EnergyMonitor tensao_saida_nobreak;
 
 void (*Reset)() = 0;
 
-#define RAW_DATA_LEN 350
+#define RAW_DATA_LEN 198
 uint16_t rawDataOff[RAW_DATA_LEN]={
   5994, 7398, 506, 1662, 478, 1710, 498, 1690, 
   458, 1706, 506, 1686, 538, 1630, 462, 1722, 
@@ -70,7 +70,7 @@ uint16_t rawDataOff[RAW_DATA_LEN]={
   482, 634, 462, 1718, 450, 678, 486, 1686, 
   446, 1734, 486, 7422, 482, 1000};
 
-#define RAW_DATA_LEN 350
+#define RAW_DATA_LEN 198
 uint16_t rawDataOn[RAW_DATA_LEN]={
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
   466, 1766, 394, 1770, 466, 1726, 434, 1774, 
@@ -98,10 +98,33 @@ uint16_t rawDataOn[RAW_DATA_LEN]={
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
 
-#define RAW_DATA_LEN 350
+#define RAW_DATA_LEN 198
 uint16_t rawDataDehumidify[RAW_DATA_LEN]={
-  
-}
+  6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
+  506, 1678, 478, 1730, 506, 1682, 474, 1730, 
+  510, 1682, 414, 722, 506, 614, 446, 690, 
+  510, 614, 474, 662, 510, 610, 510, 630, 
+  510, 610, 510, 1698, 506, 1682, 534, 1670, 
+  506, 1682, 442, 1758, 514, 1682, 446, 1754, 
+  510, 1698, 474, 642, 510, 634, 470, 646, 
+  510, 614, 462, 674, 510, 614, 414, 718, 
+  510, 638, 394, 1782, 510, 1702, 470, 1714, 
+  506, 1702, 506, 1678, 478, 1726, 510, 1682, 
+  414, 1786, 510, 634, 442, 674, 510, 614, 
+  490, 646, 506, 634, 398, 718, 510, 614, 
+  490, 642, 510, 1702, 470, 646, 510, 1698, 
+  474, 642, 510, 630, 478, 638, 510, 634, 
+  474, 1710, 510, 630, 502, 1686, 498, 638, 
+  506, 1682, 474, 1726, 482, 1726, 446, 1738, 
+  482, 662, 446, 670, 482, 1726, 482, 1702, 
+  454, 686, 506, 1678, 474, 1730, 514, 610, 
+  470, 1730, 514, 1694, 478, 638, 518, 626, 
+  474, 1710, 482, 658, 506, 610, 550, 1658, 
+  510, 610, 450, 686, 510, 1678, 466, 670, 
+  510, 1682, 462, 670, 510, 1698, 474, 642, 
+  510, 634, 470, 1714, 502, 638, 506, 1678, 
+  470, 670, 502, 1690, 462, 670, 502, 1706, 
+  442, 1738, 502, 7478, 470, 1000};
 
 void setup() {
   pinMode(MQ2PIN_DIGITAL, INPUT);
@@ -131,7 +154,7 @@ void loop() {
       Serial.print(F("Temperatura: ")); Serial.println(temperatura);
       
       if (umidade < 60) {
-        dehumity = false;
+        dehumidify = false;
         
         if (temperatura > 26 && ar_condicionado == false) {
           for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
@@ -151,10 +174,10 @@ void loop() {
           Serial.println(F("Ar desligado"));
         }
       } else {
-          if (dehumity == false) {
+          if (dehumidify == false) {
             for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
             Serial.println(F("Desumidificação em ação"));
-            dehumity = true;
+            dehumidify = true;
           }
       }      
     }
