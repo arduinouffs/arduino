@@ -153,9 +153,7 @@ void loop() {
       float umidade = dht.readHumidity();
       Serial.print(F("Temperatura: ")); Serial.println(temperatura);
       
-      if (umidade < 60) {
-        dehumidify = false;
-        
+      if (umidade < 60 && dehumidify == false) {        
         if (temperatura > 26 && ar_condicionado == false) {
           for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
           ar_condicionado = true;
@@ -178,6 +176,12 @@ void loop() {
             for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
             Serial.println(F("Desumidificação em ação"));
             dehumidify = true;
+          } else {
+            if (umidade < 50) {
+              for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+              Serial.println(F("Ar desligado"));
+              dehumidify = false;
+            }
           }
       }      
     }
@@ -257,6 +261,9 @@ void loop() {
                     request += tensao_saida_nobreak.Vrms;
                     request += "\",\"ar_condicionado\": \"";
                     if (ar_condicionado) request += "1";
+                    else request += "0";
+                    request += "\",\"desumidificacao\": \"";
+                    if (dehumidify) request += "1";
                     else request += "0";
                     request += "\"}";
                     client.print(request);
