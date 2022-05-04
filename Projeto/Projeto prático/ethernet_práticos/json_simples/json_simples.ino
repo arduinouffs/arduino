@@ -201,6 +201,8 @@ void loop() {
 //                    request += mq2.readCO();
 //                    request += "\",\"fumaca\": \"";
 //                    request += mq2.readSmoke();
+                    request += "\",\"mq2_tensao\": \"";
+                    request += analogRead(MQ2PIN);
                     request += "\",\"presenca_fumaca\": \"";
                     if (!digitalRead(MQ2PIN_DIGITAL)) request += "1";
                     else request += "0";
