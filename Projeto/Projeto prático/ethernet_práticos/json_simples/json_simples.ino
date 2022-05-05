@@ -242,39 +242,45 @@ void controleDeAr() {
       float temperatura = dht.readTemperature();
       float umidade = dht.readHumidity();
       Serial.print(F("Temperatura: ")); Serial.println(temperatura);
-      
-      if (umidade < 60 && dehumidify == false) {        
-        if (temperatura > 26 && ar_condicionado == false) {
-          for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
-          ar_condicionado = true;
-          Serial.println(F("Ar ligado"));
-        }
-  
-        if (temperatura > 28){
-          for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
-          ar_condicionado = true;
-          Serial.println(F("Forçando Ar ligado"));
-        }
-  
-        if (temperatura <= 23 && ar_condicionado) {
-          for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-          ar_condicionado = false;
-          Serial.println(F("Ar desligado"));
-        }
+            
+      if (temperatura > 26 && ar_condicionado == false) {
+        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+        ar_condicionado = true;
+        dehumidify = false;
+        Serial.println(F("Ar ligado"));
+      }
+
+      if (temperatura > 28){
+        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+        ar_condicionado = true;
+        dehumidify = false;
+        Serial.println(F("Forçando Ar ligado"));
+      }
+
+      if (temperatura <= 23 && ar_condicionado) {
+        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+        ar_condicionado = false;
+        dehumidify = false;
+        Serial.println(F("Ar desligado"));
+      }
+        
+
+      if (umidade > 60 && dehumidify == false && ar_condicionado == false) {
+        for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
+        Serial.println(F("Desumidificação em ação"));
+        dehumidify = true;
       } else {
-          if (dehumidify == false) {
-            for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
-            Serial.println(F("Desumidificação em ação"));
-            dehumidify = true;
-          } else {
-            if (umidade < 55) {
-              for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-              Serial.println(F("Ar desligado"));
-              dehumidify = false;
-            }
-          }
-      }      
+        if (umidade < 55) {
+          for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+          Serial.println(F("Ar desligado"));
+          dehumidify = false;
+        }
+      }   
     }
 
-    if (millis() > tempoDisplay + 3600000)
+    if (umaHora == 59) {
+      for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+      ar_condicionado = false;
+      Serial.println(F("Ar desligado"));
+    }
 }
