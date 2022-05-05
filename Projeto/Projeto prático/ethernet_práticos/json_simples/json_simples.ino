@@ -240,7 +240,7 @@ void controleDeAr() {
       tempoDisplay = millis() + 60000;
       umaHora++;
       if (umaHora == 59) {
-      for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado"));
