@@ -239,6 +239,13 @@ void controleDeAr() {
     if (millis() > tempoDisplay) {
       tempoDisplay = millis() + 60000;
       umaHora++;
+      if (umaHora == 59) {
+      for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+        ar_condicionado = false;
+        dehumidify = false;
+        Serial.println(F("Ar desligado"));
+        umaHora = 0;
+      }
       float temperatura = dht.readTemperature();
       float umidade = dht.readHumidity();
       Serial.print(F("Temperatura: ")); Serial.println(temperatura);
@@ -276,11 +283,5 @@ void controleDeAr() {
           dehumidify = false;
         }
       }   
-    }
-
-    if (umaHora == 59) {
-      for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-      ar_condicionado = false;
-      Serial.println(F("Ar desligado"));
     }
 }
