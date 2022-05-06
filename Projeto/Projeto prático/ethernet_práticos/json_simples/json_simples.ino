@@ -15,7 +15,7 @@ IRsendRaw mySender;
 #define NOBREAK_ENTRADA_PIN A3
 #define NOBREAK_SAIDA_PIN A2
 #define VOLT_CAL_ENTRADA 458
-#define VOLT_CAL_SAIDA 500
+#define VOLT_CAL_SAIDA 503
 #define pin2 A4 // Vout2 PM10
 #define pin1 2 // Vout1 PM2.
 
