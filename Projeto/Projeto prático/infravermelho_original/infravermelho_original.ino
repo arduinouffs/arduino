@@ -7,7 +7,7 @@
 #define frequencia 38 // kHz
 
 // DEFINIÇÃO DOS PINOS
-#define pinReceptor 11
+#define pinReceptor 2
 #define pinBot1 8
 #define pinLed 12
 
@@ -17,7 +17,7 @@ IRsend emissorIR;
 PushButton botaoLeitura(pinBot1);
 
 // DECLARAÇÃO VARIÁVEIS GLOBAIS
-bool lerComando = false;
+bool lerComando = true;
 
 // DECLARAÇÃO DAS FUNÇÕES DE LEITURA
 
