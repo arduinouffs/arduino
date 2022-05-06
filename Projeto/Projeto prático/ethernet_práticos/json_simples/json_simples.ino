@@ -277,7 +277,7 @@ void controleDeAr() {
         Serial.println(F("Desumidificação em ação"));
         dehumidify = true;
       } else {
-        if (umidade < 55 && dehumity) {
+        if (umidade < 55 && dehumidify) {
           for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
           Serial.println(F("Ar desligado3"));
           dehumidify = false;
