@@ -243,7 +243,7 @@ void controleDeAr() {
         for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
         ar_condicionado = false;
         dehumidify = false;
-        Serial.println(F("Ar desligado"));
+        Serial.println(F("Ar desligado1"));
         umaHora = 0;
       }
       float temperatura = dht.readTemperature();
@@ -264,11 +264,11 @@ void controleDeAr() {
         Serial.println(F("Forçando Ar ligado"));
       }
 
-      if (temperatura <= 23 && ar_condicionado == true) {
+      if (temperatura <= 23 && ar_condicionado) {
         for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
         ar_condicionado = false;
         dehumidify = false;
-        Serial.println(F("Ar desligadpppo")); //normal
+        Serial.println(F("Ar desligado2")); //normal
       }
         
 
@@ -277,9 +277,9 @@ void controleDeAr() {
         Serial.println(F("Desumidificação em ação"));
         dehumidify = true;
       } else {
-        if (umidade < 55) {
+        if (umidade < 55 && dehumity) {
           for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-          Serial.println(F("Ar desligado"));
+          Serial.println(F("Ar desligado3"));
           dehumidify = false;
         }
       }   
