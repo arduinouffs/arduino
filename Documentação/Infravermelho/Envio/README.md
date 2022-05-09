@@ -1,5 +1,5 @@
 
-# IRreceiver Como ler o controle remoto
+# IRsender Como emitir o infravermelho
 ### Introdução
 O emissor de infravermelho é um simples led, o qual emite luz na faixa invisível ao olho humano do infravermelho. 
 ### Montagem
