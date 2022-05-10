@@ -296,8 +296,7 @@ void controleDeAr() {
 }
 
 void sender(uint16_t rawData[RAW_DATA_LEN]) {
-  memcpy_P(inRAM, rawData, RAW_DATA_LEN);
+  memset(inRam, 0, RAW_DATA_LEN);
+  memcpy_P(inRAM, &rawData, RAW_DATA_LEN);
   mySender.send(inRAM,RAW_DATA_LEN,36);
-//  for (int i = 0; i < RAW_DATA_LEN; i++) Serial.println(inRAM[i]);
-  inRAM[RAW_DATA_LEN] = {};
 }
