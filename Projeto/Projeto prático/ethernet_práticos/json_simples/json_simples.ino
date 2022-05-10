@@ -133,7 +133,8 @@ void setup() {
   pinMode(MQ2PIN_DIGITAL, INPUT);
   Serial.begin(9600);
   Serial.println(F("Ligado"));
-  for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//  for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+  sender(rawDataOff);
   if (Ethernet.begin(mac) == 0) {
      Serial.println(F("DHCP FAILED"));
      delay(30000);
@@ -295,7 +296,8 @@ void controleDeAr() {
 }
 
 void sender(uint16_t rawData[RAW_DATA_LEN]) {
-  memcpy_P(inRAM, &rawData, RAW_DATA_LEN);
+  memcpy_P(inRAM, rawData, RAW_DATA_LEN);
   mySender.send(inRAM,RAW_DATA_LEN,36);
+//  for (int i = 0; i < RAW_DATA_LEN; i++) Serial.println(inRAM[i]);
   inRAM[RAW_DATA_LEN] = {};
 }
