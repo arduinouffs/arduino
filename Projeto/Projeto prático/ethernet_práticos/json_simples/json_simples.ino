@@ -18,6 +18,7 @@ IRsendRaw mySender;
 #define VOLT_CAL_SAIDA 503
 #define pin2 A4 // Vout2 PM10
 #define pin1 2 // Vout1 PM2.
+#define RAW_DATA_LEN 198
 
 unsigned long tempoDisplay = 0;
 unsigned short int umaHora = 0;
@@ -43,9 +44,9 @@ EnergyMonitor tensao_saida_nobreak;
 
 void (*Reset)() = 0;
 void controleDeAr();
+void sender(uint16_t rawData[RAW_DATA_LEN]);
 
-#define RAW_DATA_LEN 198
-uint16_t rawDataOff[RAW_DATA_LEN]={
+const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={
   5994, 7398, 506, 1662, 478, 1710, 498, 1690, 
   458, 1706, 506, 1686, 538, 1630, 462, 1722, 
   546, 1626, 546, 610, 518, 586, 498, 638, 
@@ -72,8 +73,7 @@ uint16_t rawDataOff[RAW_DATA_LEN]={
   482, 634, 462, 1718, 450, 678, 486, 1686, 
   446, 1734, 486, 7422, 482, 1000};
 
-#define RAW_DATA_LEN 198
-uint16_t rawDataOn[RAW_DATA_LEN]={
+const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
   466, 1766, 394, 1770, 466, 1726, 434, 1774, 
   466, 1718, 470, 670, 446, 702, 446, 670, 
@@ -100,8 +100,7 @@ uint16_t rawDataOn[RAW_DATA_LEN]={
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
 
-#define RAW_DATA_LEN 198
-uint16_t rawDataDehumidify[RAW_DATA_LEN]={
+const PROGMEM uint16_t rawDataDehumidify[RAW_DATA_LEN]={
   6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
   506, 1678, 478, 1730, 506, 1682, 474, 1730, 
   510, 1682, 414, 722, 506, 614, 446, 690, 
@@ -127,6 +126,8 @@ uint16_t rawDataDehumidify[RAW_DATA_LEN]={
   510, 634, 470, 1714, 502, 638, 506, 1678, 
   470, 670, 502, 1690, 462, 670, 502, 1706, 
   442, 1738, 502, 7478, 470, 1000};
+
+uint16_t inRAM[RAW_DATA_LEN];
 
 void setup() {
   pinMode(MQ2PIN_DIGITAL, INPUT);
@@ -213,6 +214,7 @@ void loop() {
                     else request += "0";
                     request += "\"}";
                     client.print(request);
+                    request = "";
 
                     break;                
                 }
@@ -240,7 +242,8 @@ void controleDeAr() {
       tempoDisplay = millis() + 60000;
       umaHora++;
       if (umaHora == 59) {
-        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+        sender(rawDataOff);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado1"));
@@ -251,21 +254,24 @@ void controleDeAr() {
       Serial.print(F("Temperatura: ")); Serial.println(temperatura);
             
       if (temperatura > 26 && ar_condicionado == false) {
-        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+//        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+        sender(rawDataOn);
         ar_condicionado = true;
         dehumidify = false;
         Serial.println(F("Ar ligado"));
       }
 
       if (temperatura > 28){
-        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+//        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
+        sender(rawDataOn);
         ar_condicionado = true;
         dehumidify = false;
         Serial.println(F("Forçando Ar ligado"));
       }
 
       if (temperatura <= 23 && ar_condicionado) {
-        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+        sender(rawDataOff);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado2")); //normal
@@ -273,15 +279,23 @@ void controleDeAr() {
         
 
       if (umidade > 60 && dehumidify == false && ar_condicionado == false) {
-        for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
+//        for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
+        sender(rawDataDehumidify);
         Serial.println(F("Desumidificação em ação"));
         dehumidify = true;
       } else {
         if (umidade < 55 && dehumidify) {
-          for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//          for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
+          sender(rawDataOff);
           Serial.println(F("Ar desligado3"));
           dehumidify = false;
         }
       }   
     }
+}
+
+void sender(uint16_t rawData[RAW_DATA_LEN]) {
+  memcpy_P(inRAM, &rawData, RAW_DATA_LEN);
+  mySender.send(inRAM,RAW_DATA_LEN,36);
+  inRAM[RAW_DATA_LEN] = {};
 }
