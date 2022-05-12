@@ -25,12 +25,12 @@ void  encoding (decode_results *results)
     case DISH:         Serial.print("DISH");          break ;
     case SHARP:        Serial.print("SHARP");         break ;
     case JVC:          Serial.print("JVC");           break ;
-//    case SANYO:        Serial.print("SANYO");         break ;
-//    case MITSUBISHI:   Serial.print("MITSUBISHI");    break ;
+    case SANYO:        Serial.print("SANYO");         break ;
+    case MITSUBISHI:   Serial.print("MITSUBISHI");    break ;
     case SAMSUNG:      Serial.print("SAMSUNG");       break ;
     case LG:           Serial.print("LG");            break ;
     case WHYNTER:      Serial.print("WHYNTER");       break ;
-//    case AIWA_RC_T501: Serial.print("AIWA_RC_T501");  break ;
+    case AIWA_RC_T501: Serial.print("AIWA_RC_T501");  break ;
     case PANASONIC:    Serial.print("PANASONIC");     break ;
     case DENON:        Serial.print("Denon");         break ;
   }
