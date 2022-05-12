@@ -72,6 +72,7 @@ const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={
   466, 658, 486, 1702, 482, 630, 450, 1734, 
   482, 634, 462, 1718, 450, 678, 486, 1686, 
   446, 1734, 486, 7422, 482, 1000};
+#define off 0xff00ff00ff00db245ba45
 
 const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
@@ -99,6 +100,7 @@ const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={
   410, 706, 414, 1794, 414, 706, 414, 1794, 
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
+#define on 0xff00ff00ff009b645ba45
 
 const PROGMEM uint16_t rawDataDehumidify[RAW_DATA_LEN]={
   6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
@@ -296,7 +298,7 @@ void controleDeAr() {
 }
 
 void sender(uint16_t rawData[RAW_DATA_LEN]) {
-  memset(inRam, 0, RAW_DATA_LEN);
+  memset(inRAM, 0, RAW_DATA_LEN);
   memcpy_P(inRAM, &rawData, RAW_DATA_LEN);
   mySender.send(inRAM,RAW_DATA_LEN,36);
 }
