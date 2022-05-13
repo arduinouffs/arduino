@@ -128,9 +128,9 @@ const PROGMEM uint16_t rawDataDehumidify[RAW_DATA_LEN]={
   510, 634, 470, 1714, 502, 638, 506, 1678, 
   470, 670, 502, 1690, 462, 670, 502, 1706, 
   442, 1738, 502, 7478, 470, 1000};
-#define dehumidify 0xff00ff00ff00a15e6d925
+#define dehumidifyy 0xff00ff00ff00a15e6d925
 
-#define protocol SANYO // para o controle ZH/JT-01 do KOMECO
+//#define protocol SANYO // para o controle ZH/JT-01 do KOMECO
 #define khz 38
 
 uint16_t inRAM[RAW_DATA_LEN];
@@ -141,7 +141,7 @@ void setup() {
   Serial.println(F("Ligado"));
 //  for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
 //  sender(rawDataOff);
-  mySender.send(protocol, off, khz);
+  mySender.send(UNKNOWN, off, khz);
   if (Ethernet.begin(mac) == 0) {
      Serial.println(F("DHCP FAILED"));
      delay(30000);
@@ -252,6 +252,7 @@ void controleDeAr() {
       if (umaHora == 59) {
 //        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
 //        sender(rawDataOff);
+        mySender.send(UNKNOWN, off, khz);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado1"));
@@ -264,6 +265,7 @@ void controleDeAr() {
       if (temperatura > 26 && ar_condicionado == false) {
 //        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
 //        sender(rawDataOn);
+        mySender.send(UNKNOWN, on, khz);
         ar_condicionado = true;
         dehumidify = false;
         Serial.println(F("Ar ligado"));
@@ -272,6 +274,7 @@ void controleDeAr() {
       if (temperatura > 28){
 //        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
 //        sender(rawDataOn);
+        mySender.send(UNKNOWN, on, khz);
         ar_condicionado = true;
         dehumidify = false;
         Serial.println(F("Forçando Ar ligado"));
@@ -280,6 +283,7 @@ void controleDeAr() {
       if (temperatura <= 23 && ar_condicionado) {
 //        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
 //        sender(rawDataOff);
+        mySender.send(UNKNOWN, off, khz);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado2")); //normal
@@ -289,12 +293,14 @@ void controleDeAr() {
       if (umidade > 60 && dehumidify == false && ar_condicionado == false) {
 //        for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
 //        sender(rawDataDehumidify);
+        mySender.send(UNKNOWN, dehumidifyy, khz);
         Serial.println(F("Desumidificação em ação"));
         dehumidify = true;
       } else {
         if (umidade < 55 && dehumidify) {
 //          for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
 //          sender(rawDataOff);
+          mySender.send(UNKNOWN, off, khz);
           Serial.println(F("Ar desligado3"));
           dehumidify = false;
         }
