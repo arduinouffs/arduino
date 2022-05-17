@@ -1,5 +1,5 @@
 // INCLUSÃO DE BIBLIOTECA
-#include <IRremote.h>
+#include <IRremote.hpp>
 #include <PushButton.h>
 
 // DIRETIVAS DE COMPILAÇÃO
@@ -7,12 +7,12 @@
 #define frequencia 38 // kHz
 
 // DEFINIÇÃO DOS PINOS
-#define pinReceptor 2
+#define IR_RECEIVE_PIN 2
 #define pinBot1 8
-#define pinLed 12
+#define ENABLE_LED_FEEDBACK 12
 
 // INSTANCIANDO OBJETOS
-IRrecv receptorIR(pinReceptor);
+//IRrecv receptorIR(pinReceptor);
 IRsend emissorIR;
 PushButton botaoLeitura(pinBot1);
 
@@ -36,10 +36,11 @@ unsigned int teclaD[] = {/*COPIE_OS_DADOS_DENTRO_DAS_CHAVES_DO_MONITOR_SERIAL_E_
 
 void setup() {
   Serial.begin(9600);
-  pinMode(pinLed, OUTPUT);
+//  pinMode(pinLed, OUTPUT);
 
   // INICIANDO RECEPTOR IR
-  receptorIR.enableIRIn();
+//  receptorIR.enableIRIn();
+  IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK); // Start the receiver
   Serial.print("Setup Concluído");
 
 }
@@ -51,26 +52,26 @@ void loop() {
   // BLOCO CONDIÇÕES PARA INICIAR LEITURA
   if (botaoLeitura.pressed() && !lerComando) {
     lerComando = true;
-    digitalWrite(pinLed, HIGH);
+//    digitalWrite(pinLed, HIGH);
   } else if (botaoLeitura.pressed() && lerComando) {
     lerComando = false;
-    digitalWrite(pinLed, LOW);
+//    digitalWrite(pinLed, LOW);
   }
 
   // LAÇO PARA LEITURA DO RECEPTOR IR QUANDO FOR PRESSIONADO O BOTÃO
   while (lerComando) {
 
-    decode_results  results;
+//    decode_results  results;
 
-    if (receptorIR.decode(&results)) {
-      ircode   (&results);
-      encoding (&results);
-      dumpInfo (&results);
-      dumpRaw  (&results);
-      dumpCode (&results);
-      receptorIR.resume();
+    if (IrReceiver.decode()) {
+      ircode   ();
+      encoding ();
+      dumpInfo ();
+      dumpRaw  ();
+      dumpCode ();
+      IrReceiver.resume();
       lerComando = false;
-      digitalWrite(pinLed, LOW);
+//      digitalWrite(pinLed, LOW);
     }
   }
 

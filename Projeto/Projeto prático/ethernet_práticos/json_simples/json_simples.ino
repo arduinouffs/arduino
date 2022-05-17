@@ -3,10 +3,9 @@
 #include <DHT.h>
 //#include <MQ2.h>
 #include <EmonLib.h>
-#include <IRLibSendBase.h>    //We need the base code/
-#include <IRLib_HashRaw.h>    //Only use raw sender
+#include <IRremote.h>
 
-IRsendRaw mySender;
+IRsend irsend;
 
 #define DHTPIN A0 // pino que estamos conectado
 #define DHTTYPE DHT11 // DHT
@@ -44,9 +43,9 @@ EnergyMonitor tensao_saida_nobreak;
 
 void (*Reset)() = 0;
 void controleDeAr();
-void sender(uint16_t rawData[RAW_DATA_LEN]);
+void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, unsigned char carrierFreq);
 
-const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={
+const PROGMEM unsigned int rawDataOff[]={
   5994, 7398, 506, 1662, 478, 1710, 498, 1690, 
   458, 1706, 506, 1686, 538, 1630, 462, 1722, 
   546, 1626, 546, 610, 518, 586, 498, 638, 
@@ -74,7 +73,7 @@ const PROGMEM uint16_t rawDataOff[RAW_DATA_LEN]={
   446, 1734, 486, 7422, 482, 1000};
 #define off 0xff00ff00ff00df205ba454ab
 
-const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={
+const PROGMEM unsigned int rawDataOn[]={
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
   466, 1766, 394, 1770, 466, 1726, 434, 1774, 
   466, 1718, 470, 670, 446, 702, 446, 670, 
@@ -102,7 +101,7 @@ const PROGMEM uint16_t rawDataOn[RAW_DATA_LEN]={
   414, 1794, 414, 7550, 414, 1000};
 #define on 0xff00ff00ff009f605ba454ab
 
-const PROGMEM uint16_t rawDataDehumidify[RAW_DATA_LEN]={
+const PROGMEM unsigned int rawDataDehumidify[]={
   6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
   506, 1678, 478, 1730, 506, 1682, 474, 1730, 
   510, 1682, 414, 722, 506, 614, 446, 690, 
@@ -130,8 +129,7 @@ const PROGMEM uint16_t rawDataDehumidify[RAW_DATA_LEN]={
   442, 1738, 502, 7478, 470, 1000};
 #define dehumidifyy 0xff00ff00ff009f605da254ab
 
-//#define protocol SANYO // para o controle ZH/JT-01 do KOMECO
-#define khz 38
+#define khz 36
 
 uint16_t inRAM[RAW_DATA_LEN];
 
@@ -139,9 +137,9 @@ void setup() {
   pinMode(MQ2PIN_DIGITAL, INPUT);
   Serial.begin(9600);
   Serial.println(F("Ligado"));
-//  for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//  sender(rawDataOff);
-  mySender.send(UNKNOWN, off, khz);
+//  mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//  mySender.send(UNKNOWN, off, khz);/
+  sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
   if (Ethernet.begin(mac) == 0) {
      Serial.println(F("DHCP FAILED"));
      delay(30000);
@@ -162,7 +160,7 @@ void loop() {
     Ethernet.maintain();
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
     if (client) {  // Existe um cliente em conexão ?       
-        Serial.println(F("Send")); 
+        Serial.println(F("Send json")); 
         boolean currentLineIsBlank = true;
         while (client.connected()) {          
             if (client.available()) {
@@ -250,9 +248,9 @@ void controleDeAr() {
       tempoDisplay = millis() + 60000;
       umaHora++;
       if (umaHora == 59) {
-//        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//        sender(rawDataOff);
-        mySender.send(UNKNOWN, off, khz);
+//        mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//        mySender.send(UNKNOWN, off, khz);
+        sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado1"));
@@ -263,27 +261,27 @@ void controleDeAr() {
       Serial.print(F("Temperatura: ")); Serial.println(temperatura);
             
       if (temperatura > 26 && ar_condicionado == false) {
-//        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
-//        sender(rawDataOn);
-        mySender.send(UNKNOWN, on, khz);
+//        mySender.send(rawDataOn,RAW_DATA_LEN,36);
+//        mySender.send(UNKNOWN, on, khz);/
+        sendRAW_Flash(rawDataOn, sizeof(rawDataOn)/sizeof(int),36);
         ar_condicionado = true;
         dehumidify = false;
         Serial.println(F("Ar ligado"));
       }
 
       if (temperatura > 28){
-//        for (int i = 0; i < 5; i++) mySender.send(rawDataOn,RAW_DATA_LEN,36);
-//        sender(rawDataOn);
-        mySender.send(UNKNOWN, on, khz);
+//        mySender.send(rawDataOn,RAW_DATA_LEN,36);
+//        mySender.send(UNKNOWN, on, khz);
+        sendRAW_Flash(rawDataOn, sizeof(rawDataOn)/sizeof(int),36);
         ar_condicionado = true;
         dehumidify = false;
         Serial.println(F("Forçando Ar ligado"));
       }
 
       if (temperatura <= 23 && ar_condicionado) {
-//        for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//        sender(rawDataOff);
-        mySender.send(UNKNOWN, off, khz);
+//        mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//        mySender.send(UNKNOWN, off, khz);
+        sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado2")); //normal
@@ -291,16 +289,16 @@ void controleDeAr() {
         
 
       if (umidade > 60 && dehumidify == false && ar_condicionado == false) {
-//        for (int i = 0; i < 5; i++) mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
-//        sender(rawDataDehumidify);
-        mySender.send(UNKNOWN, dehumidifyy, khz);
+//        mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
+//        mySender.send(UNKNOWN, dehumidifyy, khz);/
+        sendRAW_Flash(rawDataDehumidify, sizeof(rawDataDehumidify)/sizeof(int),36);
         Serial.println(F("Desumidificação em ação"));
         dehumidify = true;
       } else {
         if (umidade < 55 && dehumidify) {
-//          for (int i = 0; i < 5; i++) mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//          sender(rawDataOff);
-          mySender.send(UNKNOWN, off, khz);
+//          mySender.send(rawDataOff,RAW_DATA_LEN,36);
+//          mySender.send(UNKNOWN, off, khz);
+          sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
           Serial.println(F("Ar desligado3"));
           dehumidify = false;
         }
@@ -308,8 +306,11 @@ void controleDeAr() {
     }
 }
 
-void sender(uint16_t rawData[RAW_DATA_LEN]) {
-  memset(inRAM, 0, RAW_DATA_LEN);
-  memcpy_P(inRAM, &rawData, RAW_DATA_LEN);
-  mySender.send(inRAM,RAW_DATA_LEN,36);
+void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, unsigned char carrierFreq) {
+  irsend.enableIROut(carrierFreq); //initialise the carrier frequency for each signal to be sent
+  for (unsigned int i=0; i < signalLength; i++) {
+    if (i & 1) irsend.space(pgm_read_word_near(&signalArray[i]));
+    else irsend.mark(pgm_read_word_near(&signalArray[i]));
+  }
+  irsend.space(1);//make sure IR is turned off at end of signal
 }
