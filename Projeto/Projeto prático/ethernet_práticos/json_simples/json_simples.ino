@@ -197,47 +197,33 @@ void loop() {
                     pm2p5 = 1.1*pow(ratio1,3)-3.8*pow(ratio1,2)+520*ratio1+0.62; // using spec sheet curve
                   
                     ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
-                    pm10 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
-
-                    //  tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
-                    //  tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
-
-//                    tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
-//                    tensao_saida_nobreak.calcVI(17,2000);
+                    pm10 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62;
 
                     String request = "";
-                    request += "{\"temperatura\": \"";
+                    request += "{\"temp\":\"";
                     request += dht.readTemperature();
-                    request += "\",\"umidade\": \"";
+                    request += "\",\"umid\":\"";
                     request += dht.readHumidity();
-//                    request += "\",\"gas_inflamavel\": \"";
-//                    request += mq2.readLPG();
-//                    request += "\",\"CO2\": \"";
-//                    request += mq2.readCO();
-//                    request += "\",\"fumaca\": \"";
-//                    request += mq2.readSmoke();
-                    request += "\",\"mq2_tensao\": \"";
+                    request += "\",\"mq2t\":\"";
                     request += analogRead(MQ2PIN);
-                    request += "\",\"presenca_fumaca\": \"";
+                    request += "\",\"fumaca\":\"";
                     if (!digitalRead(MQ2PIN_DIGITAL)) request += "1";
                     else request += "0";
-                    request += "\",\"ar\": {\"concentracao_pm2p5\": \"";
+                    request += "\",\"ar\": {\"pm2p5\":\"";
                     request += pm2p5;
-                    request += "\",\"concentracao_pm10\": \"";
+                    request += "\",\"pm10\":\"";
                     request += pm10;
-                    request += "\"},\"tensao_entrada_nobreak\": \"";
+                    request += "\"},\"noin\":\"";
                     tensao.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
                     tensao.calcVI(17,2000);
                     request += tensao.Vrms;
-                    request += "\",\"tensao_saida_nobreak\": \"";
+                    request += "\",\"noout\":\"";
                     tensao.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
                     tensao.calcVI(17,2000);
                     request += tensao.Vrms;
-                    request += "\",\"ar_condicionado\": \"";
+                    request += "\",\"sts\":\"";
                     if (ar_condicionado) request += "1";
-                    else request += "0";
-                    request += "\",\"desumidificacao\": \"";
-                    if (dehumidify) request += "1";
+                    else if (dehumidify) request += "2";
                     else request += "0";
                     request += "\"}";
                     client.print(request);
