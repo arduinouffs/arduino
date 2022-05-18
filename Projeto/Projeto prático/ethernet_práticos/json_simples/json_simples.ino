@@ -1,8 +1,8 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include <DHT.h>
-//#include <MQ2.h>
 #include <EmonLib.h>
+#include <LiquidCrystal_I2C.h>
 #include <IRremote.h>
 
 IRsend irsend;
@@ -19,8 +19,6 @@ IRsend irsend;
 #define pin1 2 // Vout1 PM2.
 #define RAW_DATA_LEN 198
 
-unsigned long tempoDisplay = 0;
-unsigned short int umaHora = 0;
 bool ar_condicionado = false;
 bool dehumidify = false;
 
@@ -37,13 +35,25 @@ float pm10 = 0;
 const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x04 };
 const EthernetServer server(80);     // Cria um servidor WEB
 const DHT dht(DHTPIN, DHTTYPE);
-//const MQ2 mq2(MQ2PIN);
 EnergyMonitor tensao_entrada_nobreak;
 EnergyMonitor tensao_saida_nobreak;
+const LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void (*Reset)() = 0;
-void controleDeAr();
+void controleDeAr(bool force = false);
+void att_lcd(bool force = false);
 void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, unsigned char carrierFreq);
+
+byte grau[8] = {
+  B11100,
+  B10100,
+  B11100,
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000
+};
 
 const PROGMEM unsigned int rawDataOff[]={
   5994, 7398, 506, 1662, 478, 1710, 498, 1690, 
@@ -137,8 +147,6 @@ void setup() {
   pinMode(MQ2PIN_DIGITAL, INPUT);
   Serial.begin(9600);
   Serial.println(F("Ligado"));
-//  mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//  mySender.send(UNKNOWN, off, khz);/
   sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
   if (Ethernet.begin(mac) == 0) {
      Serial.println(F("DHCP FAILED"));
@@ -149,14 +157,19 @@ void setup() {
   }
   server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
   dht.begin();
-//  mq2.begin();
   tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
   tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
   Serial.println(Ethernet.localIP());
+  lcd.init();
+  lcd.backlight();
+  lcd.createChar(0, grau);
+  controleDeAr(true);
+  att_lcd(true);
 }
 
 void loop() {
     controleDeAr();
+    att_lcd();
     Ethernet.maintain();
     EthernetClient client = server.available();  // Tenta pegar uma conexão com o cliente (Browser)
     if (client) {  // Existe um cliente em conexão ?       
@@ -220,7 +233,6 @@ void loop() {
                     else request += "0";
                     request += "\"}";
                     client.print(request);
-                    request = "";
 
                     break;                
                 }
@@ -243,26 +255,20 @@ void loop() {
     } // fim do if (client)
 } // fim do loop
 
-void controleDeAr() {
-    if (millis() > tempoDisplay) {
-      tempoDisplay = millis() + 60000;
-      umaHora++;
-      if (umaHora == 59) {
-//        mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//        mySender.send(UNKNOWN, off, khz);
+void controleDeAr(bool force) {
+    if ((millis() % 60000) == 0 || force) {
+      float temperatura = dht.readTemperature();
+      float umidade = dht.readHumidity();
+
+      if ((millis() % 3600000) == 0) { // 1h
         sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
         ar_condicionado = false;
         dehumidify = false;
         Serial.println(F("Ar desligado1"));
-        umaHora = 0;
       }
-      float temperatura = dht.readTemperature();
-      float umidade = dht.readHumidity();
       Serial.print(F("Temperatura: ")); Serial.println(temperatura);
             
       if (temperatura > 26 && ar_condicionado == false) {
-//        mySender.send(rawDataOn,RAW_DATA_LEN,36);
-//        mySender.send(UNKNOWN, on, khz);/
         sendRAW_Flash(rawDataOn, sizeof(rawDataOn)/sizeof(int),36);
         ar_condicionado = true;
         dehumidify = false;
@@ -270,8 +276,6 @@ void controleDeAr() {
       }
 
       if (temperatura > 28){
-//        mySender.send(rawDataOn,RAW_DATA_LEN,36);
-//        mySender.send(UNKNOWN, on, khz);
         sendRAW_Flash(rawDataOn, sizeof(rawDataOn)/sizeof(int),36);
         ar_condicionado = true;
         dehumidify = false;
@@ -279,8 +283,6 @@ void controleDeAr() {
       }
 
       if (temperatura <= 23 && ar_condicionado) {
-//        mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//        mySender.send(UNKNOWN, off, khz);
         sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
         ar_condicionado = false;
         dehumidify = false;
@@ -289,15 +291,11 @@ void controleDeAr() {
         
 
       if (umidade > 60 && dehumidify == false && ar_condicionado == false) {
-//        mySender.send(rawDataDehumidify,RAW_DATA_LEN,36);
-//        mySender.send(UNKNOWN, dehumidifyy, khz);/
         sendRAW_Flash(rawDataDehumidify, sizeof(rawDataDehumidify)/sizeof(int),36);
         Serial.println(F("Desumidificação em ação"));
         dehumidify = true;
       } else {
         if (umidade < 55 && dehumidify) {
-//          mySender.send(rawDataOff,RAW_DATA_LEN,36);
-//          mySender.send(UNKNOWN, off, khz);
           sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),36);
           Serial.println(F("Ar desligado3"));
           dehumidify = false;
@@ -313,4 +311,26 @@ void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, 
     else irsend.mark(pgm_read_word_near(&signalArray[i]));
   }
   irsend.space(1);//make sure IR is turned off at end of signal
+}
+
+void att_lcd(bool force) {
+  static bool mode = true;
+  if ((millis() % 10000) == 0 || force) {
+    if (mode) {
+      lcd.clear();
+      lcd.print("IP local:");
+      lcd.setCursor(0,1);
+      lcd.print(Ethernet.localIP());
+    } else {
+      lcd.clear();
+      lcd.print("Temperatura: ");
+      lcd.print(int(dht.readTemperature()));
+      lcd.write((byte)0);
+      lcd.setCursor(0, 1);
+      lcd.print("Umidade:     ");
+      lcd.print(int(dht.readHumidity()));
+      lcd.print("%");
+    }
+    mode = !mode;
+  }
 }
