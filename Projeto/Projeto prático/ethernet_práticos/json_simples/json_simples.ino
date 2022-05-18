@@ -35,8 +35,9 @@ float pm10 = 0;
 const byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0x04 };
 const EthernetServer server(80);     // Cria um servidor WEB
 const DHT dht(DHTPIN, DHTTYPE);
-EnergyMonitor tensao_entrada_nobreak;
-EnergyMonitor tensao_saida_nobreak;
+//EnergyMonitor tensao_entrada_nobreak;
+//EnergyMonitor tensao_saida_nobreak;
+EnergyMonitor tensao;
 const LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void (*Reset)() = 0;
@@ -157,8 +158,8 @@ void setup() {
   }
   server.begin();           // Inicia esperando por requisições dos clientes (Browsers)
   dht.begin();
-  tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
-  tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
+//  tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
+//  tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
   Serial.println(Ethernet.localIP());
   lcd.init();
   lcd.backlight();
@@ -198,8 +199,11 @@ void loop() {
                     ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
                     pm10 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62; // 
 
-                    tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
-                    tensao_saida_nobreak.calcVI(17,2000);
+                    //  tensao_entrada_nobreak.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
+                    //  tensao_saida_nobreak.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
+
+//                    tensao_entrada_nobreak.calcVI(17,2000); //FUNÇÃO DE CÁLCULO (17 SEMICICLOS, TEMPO LIMITE PARA FAZER A MEDIÇÃO)    
+//                    tensao_saida_nobreak.calcVI(17,2000);
 
                     String request = "";
                     request += "{\"temperatura\": \"";
@@ -222,9 +226,13 @@ void loop() {
                     request += "\",\"concentracao_pm10\": \"";
                     request += pm10;
                     request += "\"},\"tensao_entrada_nobreak\": \"";
-                    request += tensao_entrada_nobreak.Vrms;
+                    tensao.voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA, 1.7);
+                    tensao.calcVI(17,2000);
+                    request += tensao.Vrms;
                     request += "\",\"tensao_saida_nobreak\": \"";
-                    request += tensao_saida_nobreak.Vrms;
+                    tensao.voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA, 1.7);
+                    tensao.calcVI(17,2000);
+                    request += tensao.Vrms;
                     request += "\",\"ar_condicionado\": \"";
                     if (ar_condicionado) request += "1";
                     else request += "0";
@@ -250,7 +258,7 @@ void loop() {
             } // fim do if (client.available())
         } // fim do while (client.connected())
         
-        delay(1);      // da um tempo para o WEB Browser receber o texto
+        delay(100);      // da um tempo para o WEB Browser receber o texto
         client.stop(); // termina a conexão
     } // fim do if (client)
 } // fim do loop
