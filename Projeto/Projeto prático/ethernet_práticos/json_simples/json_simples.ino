@@ -140,9 +140,10 @@ const PROGMEM unsigned int rawDataDehumidify[]={
   442, 1738, 502, 7478, 470, 1000};
 #define dehumidifyy 0xff00ff00ff009f605da254ab
 
-#define khz 36
+const PROGMEM char cabecalho[116] = "HTTP/1.1 200 OK\nContent-Type:aplication/json\nContent-Disposition:attachment;filename=\"data.json\"\nConnection:close\n";
 
-uint16_t inRAM[RAW_DATA_LEN];
+
+#define khz 36
 
 void setup() {
   pinMode(MQ2PIN_DIGITAL, INPUT);
@@ -182,11 +183,7 @@ void loop() {
                                 
                 if (c == '\n' && currentLineIsBlank) {  
                     // ENVIA A PÁGINA WEB
-                    client.println("HTTP/1.1 200 OK");
-                    client.println("Content-Type: aplication/json");
-                    client.println("Content-Disposition: attachment ; filename = \"data.json\"");
-                    client.println("Connection: close");
-                    client.println();
+                    client.println(cabecalho);
 
                     duration1 = pulseIn(pin1, LOW);
                     duration2 = pulseIn(pin2, LOW);
