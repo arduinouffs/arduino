@@ -1,7 +1,3 @@
-//#define RAW_DATA_LEN 198
-
-
-
 extern void controleDeAr(bool force = false);
 void att_lcd(bool force = false);
 extern void json_generator();

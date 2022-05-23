@@ -17,7 +17,8 @@ const EthernetServer server(80);     // Cria um servidor WEB
 #define VOLT_CAL_ENTRADA 458
 #define VOLT_CAL_SAIDA 503
 #define pin2 A4 // Vout2 PM10
-#define pin1 2 // Vout1 PM2.
+#define pin1 2 // Vout1 PM2
+//#define RAW_DATA_LEN 198
 
 #define sampletime_ms 3000 //sampe 1s ;
 unsigned long duration1;
