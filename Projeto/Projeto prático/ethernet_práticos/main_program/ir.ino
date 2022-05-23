@@ -31,7 +31,7 @@ const PROGMEM short rawDataOff[]={
   466, 658, 486, 1702, 482, 630, 450, 1734, 
   482, 634, 462, 1718, 450, 678, 486, 1686, 
   446, 1734, 486, 7422, 482, 1000};
-#define off 0xff00ff00ff00df205ba454ab
+#define off_ 0xff00ff00ff00df205ba454ab
 
 const PROGMEM short rawDataOn[]={
   5998, 7474, 466, 1718, 470, 1730, 454, 1746, 
@@ -59,7 +59,7 @@ const PROGMEM short rawDataOn[]={
   410, 706, 414, 1794, 414, 706, 414, 1794, 
   414, 706, 414, 1770, 438, 706, 414, 1770, 
   414, 1794, 414, 7550, 414, 1000};
-#define on 0xff00ff00ff009f605ba454ab
+#define on_ 0xff00ff00ff009f605ba454ab
 
 const PROGMEM short rawDataDehumidify[]={
   6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
@@ -87,7 +87,7 @@ const PROGMEM short rawDataDehumidify[]={
   510, 634, 470, 1714, 502, 638, 506, 1678, 
   470, 670, 502, 1690, 462, 670, 502, 1706, 
   442, 1738, 502, 7478, 470, 1000};
-#define dehumidifyy 0xff00ff00ff009f605da254ab
+#define dehumidify_ 0xff00ff00ff009f605da254ab
 
 #define khz 36
 

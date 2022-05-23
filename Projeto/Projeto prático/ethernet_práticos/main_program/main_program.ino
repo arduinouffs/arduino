@@ -1,5 +1,5 @@
 extern void controleDeAr(bool force = false);
-void att_lcd(bool force = false);
+//void att_lcd(bool force = false);
 extern void json_generator();
 extern void DHCP_connect();
 extern void controleDeAr(bool force);
