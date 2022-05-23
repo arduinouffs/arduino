@@ -21,6 +21,8 @@ IRsend irsend;
 
 bool ar_condicionado = false;
 bool dehumidify = false;
+unsigned long timeDisplay = 0;
+unsigned long timeAC = 0;
 
 #define sampletime_ms 3000 //sampe 1s ;
 unsigned long duration1;
@@ -112,32 +114,32 @@ const PROGMEM short rawDataOn[]={
   414, 1794, 414, 7550, 414, 1000};
 #define on 0xff00ff00ff009f605ba454ab
 
-const PROGMEM short rawDataDehumidify[]={
-  6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
-  506, 1678, 478, 1730, 506, 1682, 474, 1730, 
-  510, 1682, 414, 722, 506, 614, 446, 690, 
-  510, 614, 474, 662, 510, 610, 510, 630, 
-  510, 610, 510, 1698, 506, 1682, 534, 1670, 
-  506, 1682, 442, 1758, 514, 1682, 446, 1754, 
-  510, 1698, 474, 642, 510, 634, 470, 646, 
-  510, 614, 462, 674, 510, 614, 414, 718, 
-  510, 638, 394, 1782, 510, 1702, 470, 1714, 
-  506, 1702, 506, 1678, 478, 1726, 510, 1682, 
-  414, 1786, 510, 634, 442, 674, 510, 614, 
-  490, 646, 506, 634, 398, 718, 510, 614, 
-  490, 642, 510, 1702, 470, 646, 510, 1698, 
-  474, 642, 510, 630, 478, 638, 510, 634, 
-  474, 1710, 510, 630, 502, 1686, 498, 638, 
-  506, 1682, 474, 1726, 482, 1726, 446, 1738, 
-  482, 662, 446, 670, 482, 1726, 482, 1702, 
-  454, 686, 506, 1678, 474, 1730, 514, 610, 
-  470, 1730, 514, 1694, 478, 638, 518, 626, 
-  474, 1710, 482, 658, 506, 610, 550, 1658, 
-  510, 610, 450, 686, 510, 1678, 466, 670, 
-  510, 1682, 462, 670, 510, 1698, 474, 642, 
-  510, 634, 470, 1714, 502, 638, 506, 1678, 
-  470, 670, 502, 1690, 462, 670, 502, 1706, 
-  442, 1738, 502, 7478, 470, 1000};
+//const PROGMEM short rawDataDehumidify[]={
+//  6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
+//  506, 1678, 478, 1730, 506, 1682, 474, 1730, 
+//  510, 1682, 414, 722, 506, 614, 446, 690, 
+//  510, 614, 474, 662, 510, 610, 510, 630, 
+//  510, 610, 510, 1698, 506, 1682, 534, 1670, 
+//  506, 1682, 442, 1758, 514, 1682, 446, 1754, 
+//  510, 1698, 474, 642, 510, 634, 470, 646, 
+//  510, 614, 462, 674, 510, 614, 414, 718, 
+//  510, 638, 394, 1782, 510, 1702, 470, 1714, 
+//  506, 1702, 506, 1678, 478, 1726, 510, 1682, 
+//  414, 1786, 510, 634, 442, 674, 510, 614, 
+//  490, 646, 506, 634, 398, 718, 510, 614, 
+//  490, 642, 510, 1702, 470, 646, 510, 1698, 
+//  474, 642, 510, 630, 478, 638, 510, 634, 
+//  474, 1710, 510, 630, 502, 1686, 498, 638, 
+//  506, 1682, 474, 1726, 482, 1726, 446, 1738, 
+//  482, 662, 446, 670, 482, 1726, 482, 1702, 
+//  454, 686, 506, 1678, 474, 1730, 514, 610, 
+//  470, 1730, 514, 1694, 478, 638, 518, 626, 
+//  474, 1710, 482, 658, 506, 610, 550, 1658, 
+//  510, 610, 450, 686, 510, 1678, 466, 670, 
+//  510, 1682, 462, 670, 510, 1698, 474, 642, 
+//  510, 634, 470, 1714, 502, 638, 506, 1678, 
+//  470, 670, 502, 1690, 462, 670, 502, 1706, 
+//  442, 1738, 502, 7478, 470, 1000};
 #define dehumidifyy 0xff00ff00ff009f605da254ab
 
 //const PROGMEM char cabecalho[] = "HTTP/1.1 200 OK\nContent-Type:aplication/json\nContent-Disposition:attachment;filename=\"data.json\"\nConnection:close\n";
@@ -247,6 +249,7 @@ void loop() {
 
 void controleDeAr(bool force) {
     if ((millis() % 60000) == 0 || force) {
+//    if (millis() > timeAC) {
       float temperatura = dht.readTemperature();
       float umidade = dht.readHumidity();
 
@@ -281,7 +284,7 @@ void controleDeAr(bool force) {
         
 
       if (umidade > 60 && dehumidify == false && ar_condicionado == false) {
-        sendRAW_Flash(rawDataDehumidify, sizeof(rawDataDehumidify)/sizeof(int),khz);
+//        sendRAW_Flash(rawDataDehumidify, sizeof(rawDataDehumidify)/sizeof(int),khz);
         Serial.println(F("Desumidificação em ação"));
         dehumidify = true;
       } else {
@@ -292,6 +295,7 @@ void controleDeAr(bool force) {
         }
       }   
     }
+    timeAC = millis() + 60000;
 }
 
 void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, unsigned char carrierFreq) {
@@ -306,6 +310,7 @@ void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, 
 void att_lcd(bool force) {
   static bool mode = true;
   if ((millis() % 10000) == 0 || force) {
+//  if (millis() > timeDisplay) {
     if (mode) {
       lcd.clear();
       lcd.print("IP local:");
@@ -322,5 +327,6 @@ void att_lcd(bool force) {
       lcd.print("%");
     }
     mode = !mode;
+    timeDisplay = millis() + 10000;
   }
 }
