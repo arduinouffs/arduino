@@ -1,20 +1,22 @@
-extern void controleDeAr(bool force = false);
+extern void air_control(bool force = false);
 //void att_lcd(bool force = false);
-extern void json_generator();
+extern void client_verify();
 extern void DHCP_connect();
 extern void controleDeAr(bool force);
 //extern void inicialize_lcd();
+extern void inicialize_sensors();
 
 void setup() {
   Serial.begin(9600);
   Serial.println(F("Ligado"));
   DHCP_connect();
+  inicialize_sensors();
 //  inicialize_lcd();
-  controleDeAr(true);
+  air_control(true);
 }
 
 void loop() {
-    controleDeAr();
+    air_control();
 //    att_lcd();
-    json_generator();
+    client_verify();
 }

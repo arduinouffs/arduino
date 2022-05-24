@@ -100,7 +100,7 @@ void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, 
   irsend.space(1);//make sure IR is turned off at end of signal
 }
 
-void controleDeAr(bool force) {
+void air_control(bool force) {
     static bool init_ = true;
     if (init_) {
       sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),khz);
