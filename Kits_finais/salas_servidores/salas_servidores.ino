@@ -2,8 +2,7 @@ extern void air_control(bool force = false);
 //void att_lcd(bool force = false);
 extern void client_verify();
 extern void DHCP_connect();
-extern void controleDeAr(bool force);
-//extern void inicialize_lcd();
+//extern void inicialize_lcd(bool force = false);
 extern void inicialize_sensors();
 
 void setup() {
