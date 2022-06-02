@@ -23,10 +23,10 @@ String read_ppm() {
   ratio2 = lowpulseoccupancy2/(sampletime_ms*10.0);  // Integer percentage 0=>100
   pm10 = 1.1*pow(ratio2,3)-3.8*pow(ratio2,2)+520*ratio2+0.62;
 
-  String request = "\",\"ar\":{\"pm2p5\":\"";
-  request += pm2p5;
-  request += "\",\"pm10\":\"";
-  request += pm10;
+  String request = "\",\"a\":{\"p\":\"";
+  request += pm2p5; // partículas PM2.5
+  request += "\",\"q\":\"";
+  request += pm10; // partículas PM10ho
   request += "\"}";
 
   return request;

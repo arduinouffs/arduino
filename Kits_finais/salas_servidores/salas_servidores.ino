@@ -5,17 +5,32 @@ extern void DHCP_connect();
 //extern void inicialize_lcd(bool force = false);
 extern void inicialize_sensors();
 
-void setup() {
+//void setup() {
+//  Serial.begin(9600);
+//  Serial.println(F("Ligado"));
+//  DHCP_connect();
+//  inicialize_sensors();
+//  //  inicialize_lcd();
+//  air_control(true);
+//}
+//
+//void loop() {
+//  air_control();
+//  //    att_lcd();
+//  client_verify();
+//}
+
+int main() {
   Serial.begin(9600);
   Serial.println(F("Ligado"));
   DHCP_connect();
   inicialize_sensors();
-//  inicialize_lcd();
+  //  inicialize_lcd();
   air_control(true);
-}
-
-void loop() {
+  
+  while (true) {
     air_control();
 //    att_lcd();
     client_verify();
+  }
 }
