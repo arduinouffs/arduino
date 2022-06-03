@@ -1,7 +1,7 @@
 #include <IRremote.h>
 
 // caso precise, defina cabeçalho de função aqui
-void controleDeAr(bool force = false);
+void air_control(bool force = false);
 
 IRsend irsend;
 

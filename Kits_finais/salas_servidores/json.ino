@@ -31,7 +31,7 @@ void json_generator(EthernetClient client) {
   request += read_ppm(); // leitura de PM10 e PM2.5 de partículas sólidas
   request += ",\"n\":\"";
   request += read_voltage(NOBREAK_ENTRADA_PIN, VOLT_CAL_ENTRADA); // voltagem de entrada no Nobreak
-  request += "\",\"m\":\"";
+  request += "\",\"z\":\"";
   request += read_voltage(NOBREAK_SAIDA_PIN, VOLT_CAL_SAIDA); // voltagem de saída no Nobreak
   request += "\",\"s\":\"";
   if (ar_condicionado) request += "1";
