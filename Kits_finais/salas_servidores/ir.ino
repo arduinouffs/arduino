@@ -101,10 +101,8 @@ void sendRAW_Flash(const unsigned int * signalArray, unsigned int signalLength, 
 }
 
 void air_control(bool force) {
-    static bool init_ = true;
-    if (init_) {
+    if (force) {
       sendRAW_Flash(rawDataOff, sizeof(rawDataOff)/sizeof(int),khz);
-      init_ = false;
     }
     if ((millis() % 60000) == 0 || force) {
 //    if (millis() > timeAC) {
