@@ -3,7 +3,6 @@
 ### Introdução
 Esse display exibe informações em uma tela de 16x2 caracteres, em que um caractere possui uma resolução 5x10 pixels. Módulo I2C reduz a quantidade de interface usada para dados com apenas 2 pinos.
 ### Montagem
-Trabalha conectado ao
 ![lcd](lcd.png) ![config](config.png)
 |Pino|Função|
 |-|-|
