@@ -1,6 +1,6 @@
 extern void air_control(bool force = false);
-//extern void inicialize_lcd();
-//extern void att_lcd(bool force = false);
+extern void inicialize_lcd();
+extern void att_lcd(bool force = false);
 extern void client_verify();
 extern void DHCP_connect();
 extern void inicialize_sensors();

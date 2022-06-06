@@ -1,4 +1,4 @@
-#include <LiquidCrystal_I2C.h>
+#include <myLiquidCrystal_I2C.h>
 
 // caso precise, defina cabeçalho de função aqui
 
@@ -13,7 +13,7 @@ byte grau[8] = {
   B00000
 };
 
-const LiquidCrystal_I2C lcd(0x27, 16, 2);
+const myLiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void inicialize_lcd() {
   lcd.init();
