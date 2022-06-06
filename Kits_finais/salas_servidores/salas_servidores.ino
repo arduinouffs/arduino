@@ -10,14 +10,14 @@ void setup() {
   Serial.println(F("Ligado"));
   DHCP_connect();
   inicialize_sensors();
-//  inicialize_lcd();
-//  att_lcd(true);
+  inicialize_lcd();
+  att_lcd(true);
   air_control(true);
 }
 
 void loop() {
   air_control();
-//  att_lcd();
+  att_lcd();
   client_verify();
 }
 
@@ -26,13 +26,13 @@ void loop() {
 //  Serial.println(F("Ligado"));
 //  DHCP_connect();
 //  inicialize_sensors();
-////  inicialize_lcd();
-////  att_lcd(true);
+//  inicialize_lcd();
+//  att_lcd(true);
 //  air_control(true);
 //  
 //  while (true) {
 //    air_control();
-////    att_lcd();
+//    att_lcd();
 //    client_verify();
 //  }
 //}
