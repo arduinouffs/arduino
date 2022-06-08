@@ -3,7 +3,7 @@
 // caso precise, defina cabeçalho de função 
 
 #define DHTPIN A0 // pino que estamos conectado
-#define DHTTYPE DHT11 // DHT
+#define DHTTYPE DHT22 // DHT
 
 const DHT dht(DHTPIN, DHTTYPE);
 
