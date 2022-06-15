@@ -61,4 +61,5 @@ low = p2_zeros_average / zero_count
 
 bits_str = "".join(str(x) for x in bits)
 
-print(hex(int(bits_str, 2)))
+print(bits_str)
+# print(hex(int(bits_str, 2)))
