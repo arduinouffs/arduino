@@ -2,7 +2,7 @@ def pairwise(iterable):
     a = iter(iterable)
     return zip(a, a)
 
-raw_data = [6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
+raw_data = [  6062, 7422, 458, 1750, 510, 1678, 506, 1702, 
   506, 1678, 478, 1730, 506, 1682, 474, 1730, 
   510, 1682, 414, 722, 506, 614, 446, 690, 
   510, 614, 474, 662, 510, 610, 510, 630, 
@@ -62,4 +62,4 @@ low = p2_zeros_average / zero_count
 bits_str = "".join(str(x) for x in bits)
 
 print(bits_str)
-# print(hex(int(bits_str, 2)))
+print(hex(int(bits_str, 2)))
