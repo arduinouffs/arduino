@@ -20,23 +20,23 @@ void loop() {
 
 void NEC (String command) {
   digitalWrite(pin, false);
-  // cabeçalho 
-//  digitalWrite(pin, true);
-//  delay(9);
-//  digitalWrite(pin, false);
-//  delayMicroseconds(4500);
-  // comandos
+//   cabeçalho 
+  digitalWrite(pin, true);
+  delay(9);
+  digitalWrite(pin, false);
+  delayMicroseconds(4500);
+//   comandos
   for (short i = 0; i < command.length(); i++) {
-    if (command[i] == "1") {
+    if (command[i] == '1') {
       digitalWrite(pin, true);
       delayMicroseconds(560);
       digitalWrite(pin, false);
-      delayMicroseconds(2250);
+      delayMicroseconds(1690);
     } else { // == 0
       digitalWrite(pin, true);
       delayMicroseconds(560);
       digitalWrite(pin, false);
-      delayMicroseconds(1125);
+      delayMicroseconds(565);
     }
   }
 }
