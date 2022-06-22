@@ -35,4 +35,4 @@ Tudo o que for texto sequencial pode ser printado em uma sequência única, como
 ### Contornando problemas de interpretação com o Zabbix
 Em caso do Zabbix não saber interpretar ```\t```, ```\``` ou ```\n```(caracteres especiais),  podemos contornar este problema com uma abordagem de construção do arquivo JSON diferente:
 ![jsonnew](jsonnew.png)
-Strings são concatenadas e só ao fim enviadas, perceba que não foi feito uso de nenhum caractere ```\t```, ```\``` ou ```\n``` na construção do JSON, só no cabeçalho. A redução da quantidade também proporciona um menor uso de SRAM.
+Strings são concatenadas e só ao fim enviadas, perceba que não foi feito uso de nenhum caractere ```\t``` e ```\n``` na construção do JSON, só no cabeçalho. A redução da quantidade também proporciona um menor uso de SRAM.
