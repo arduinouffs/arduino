@@ -1,3 +1,4 @@
+
 # JSON Como foi criado
 ### Introdução
 O JSON emitido pela placa de rede foi constituído com base em prints, esses seguindo uma lógica para que o documento fique com a formatação esperada em um arquivo do tipo.
@@ -30,3 +31,8 @@ mais
 ```
 
 Tudo o que for texto sequencial pode ser printado em uma sequência única, como "\n", "\t", "\""(Para poder printar " obrigatoriamente deve vir acompanhada de \: "\"". Essa regra vale em qualquer linguagem de programação em que deseja-se mostrar um caractere reservado pela linguagem!), ":", "{" ou "}", "," e textos fixos. Já dados obtidos pelos sensores obrigatoriamente deve estar em um print independente. Importante: Já que o controle de "\n" está sendo feito manualmente, no caso da criação do JSON é melhor limitar-se ao ```client.print()``` e não utilizar a variação "ln" para melhor compreensão do resulta final.
+
+### Contornando problemas de interpretação com o Zabbix
+Em caso do Zabbix não saber interpretar ```\t```, ```\``` ou ```\n```(caracteres especiais),  podemos contornar este problema com uma abordagem de construção do arquivo JSON diferente:
+![jsonnew](jsonnew.png)
+Strings são concatenadas e só ao fim enviadas, perceba que não foi feito uso de nenhum caractere ```\t```, ```\``` ou ```\n``` na construção do JSON, só no cabeçalho. A redução da quantidade também proporciona um menor uso de SRAM.
