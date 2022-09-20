@@ -1,9 +1,14 @@
-void setup() {
-  // put your setup code here, to run once:
+#define pin 2
 
+String command = "";
+
+void setup() {
+  pinMode(pin, INPUT);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  bool re = digitalRead(pin);
+  if (re) {
+    command += "1";
+  }
 }
